@@ -1,5 +1,6 @@
 "use client";
 
+import ModalEnquiries from "@/components/Employee/Enquiries/modalEnquiries";
 import { Filter, Eye, Phone, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 
@@ -42,6 +43,7 @@ const enquiries: {
 export default function Enquiries() {
     const [selectedTab, setSelectedTab] = useState<string>("All");
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isModal, setIsModal] = useState<boolean>(false);
 
     // Filtered Enquiries Based on Tab & Search
     const filteredEnquiries = enquiries.filter((enquiry) =>
@@ -51,6 +53,7 @@ export default function Enquiries() {
 
     return (
         <div className="bg-white shadow-md rounded-lg p-0 md:p-6 w-full">
+            {isModal && <ModalEnquiries onClose= {()=>{setIsModal(!isModal)}}/>}
             {/* Header */}
             <div className="flex md:flex-row flex-col justify-start md:justify-between items-start gap-3 md:items-center mb-4">
                 <div>
@@ -116,7 +119,7 @@ export default function Enquiries() {
                                     </td>
                                     {/* Actions */}
                                     <td className="py-4 my-auto md:py-8 px-4 flex gap-3 justify-center">
-                                        <button className="hover:text-gray-600">
+                                        <button onClick={()=> setIsModal(!isModal)} className="hover:text-gray-600">
                                             <Eye size={20} />
                                         </button>
                                         <button className="hover:text-gray-600">

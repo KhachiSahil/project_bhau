@@ -61,7 +61,7 @@ export default function Reports() {
             </div>
 
             {/* Tabs (Mobile Dropdown) */}
-            <div className="md:hidden relative z-50">
+            <div className="md:hidden relative z-10">
                 <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="w-full flex items-center justify-between px-4 py-3 border rounded-lg text-gray-700 font-medium bg-gray-100"

@@ -28,7 +28,7 @@ export default function EmployeeSideBar() {
 
       {/* Sidebar */}
       <div
-        className={`h-screen bg-[#fbfafa] text-black flex flex-col py-4 shadow-md absolute md:relative ${
+        className={`h-screen z-40 bg-[#fbfafa] text-black flex flex-col py-4 shadow-md absolute md:relative ${
           isOpen ? "w-screen" : "w-0"
         } md:w-80 transition-all duration-300 overflow-hidden`}
       >
