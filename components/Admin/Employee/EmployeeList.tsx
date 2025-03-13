@@ -1,0 +1,84 @@
+import { LucideSearch, MoreHorizontal } from "lucide-react";
+
+const employees = [
+    { name: "Priya Sharma", email: "priya.s@travelcrm.com", role: "Senior Travel Consultant", team: "Luxury", location: "Mumbai", status: "active" },
+    { name: "Rahul Verma", email: "rahul.v@travelcrm.com", role: "Travel Consultant", team: "Adventure", location: "Delhi", status: "active" },
+    { name: "Ananya Patel", email: "ananya.p@travelcrm.com", role: "Travel Consultant", team: "Family", location: "Bangalore", status: "active" },
+    { name: "Vikram Singh", email: "vikram.s@travelcrm.com", role: "Travel Consultant", team: "Business", location: "Chennai", status: "active" },
+    { name: "Neha Gupta", email: "neha.g@travelcrm.com", role: "Team Lead", team: "Luxury", location: "Hyderabad", status: "active" },
+    { name: "Arjun Reddy", email: "arjun.r@travelcrm.com", role: "Team Lead", team: "Adventure", location: "Pune", status: "active" },
+    { name: "Divya Krishnan", email: "divya.k@travelcrm.com", role: "Travel Consultant", team: "Family", location: "Kolkata", status: "inactive" },
+    { name: "Sanjay Mehta", email: "sanjay.m@travelcrm.com", role: "Travel Consultant", team: "Business", location: "Ahmedabad", status: "active" },
+    { name: "Sanjay Mehta", email: "sanjay.m@travelcrm.com", role: "Travel Consultant", team: "Business", location: "Ahmedabad", status: "active" },
+    
+];
+
+export default function EmployeeTable() {
+    return (
+        <div className=" md:p-8 bg-white rounded-xl shadow-lg w-full">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-bold">Employees</h2>
+                    <p className="text-gray-500 text-sm md:text-lg">Manage your team members and their roles</p>
+                </div>
+                <div className="relative md:w-96">
+                    <input
+                        type="text"
+                        placeholder="Search employees..."
+                        className="pl-12 pr-4 py-3 w-full text-base md:text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
+                    />
+                    <LucideSearch className="absolute left-4 top-3 text-gray-400" size={22} />
+                </div>
+            </div>
+
+            <div className="w-[95vw] md:w-auto">
+                <div className="w-full overflow-x-auto">
+                    <table className="w-full border-collapse text-base md:text-lg">
+                        <thead>
+                            <tr className="bg-gray-100 text-left text-gray-600 uppercase font-semibold">
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Employee</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Role</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Team</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Location</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Status</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {employees.map((emp, index) => (
+                                <tr key={index} className="border-t">
+                                    <td className="py-4 px-2 md:px-6">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full" />
+                                            <div>
+                                                <p className="font-bold text-lg md:text-xl">{emp.name}</p>
+                                                <p className="text-gray-500 text-base font-semibold">{emp.email}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.role}</td>
+                                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.team}</td>
+                                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.location}</td>
+                                    <td className="py-4 px-2 md:px-6">
+                                        <span
+                                            className={`px-4 py-2 text-sm md:text-lg font-semibold rounded-full ${emp.status === "active"
+                                                    ? "bg-black text-white"
+                                                    : "bg-gray-200 text-gray-600"
+                                                }`}
+                                        >
+                                            {emp.status}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-2 md:px-6">
+                                        <MoreHorizontal className="text-gray-500 cursor-pointer" size={26} />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}
