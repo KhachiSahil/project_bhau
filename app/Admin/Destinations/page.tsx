@@ -1,7 +1,11 @@
-export default function Destinations(){
-    return(
+import TopSegment from "@/components/Admin/Destinations/TopSegment";
+import TravelPackagesTable from "@/components/Admin/Destinations/TableContent";
+
+export default function Destinations() {
+    return (
         <div>
-            This is destinations
+            <TopSegment />
+            <TravelPackagesTable />
         </div>
     )
 }
