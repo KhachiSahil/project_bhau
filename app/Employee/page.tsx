@@ -23,13 +23,15 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Section */}
+      <div className="grid grid-cols-1">
+        <RecentEnquiries />
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PerformanceChart />
         <ConversionRateChart />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentEnquiries/>
-        <UpcomingFollowUps/>
+      <div className="grid grid-cols-1 gap-6">
+        <UpcomingFollowUps />
       </div>
     </div>
   );
