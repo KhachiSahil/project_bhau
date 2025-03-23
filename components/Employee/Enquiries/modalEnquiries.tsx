@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { format, differenceInDays, addDays } from "date-fns";
+import FollowUp from "./FollowUpProps";
 type ModalProps = {
     onClose: () => void;
 };
@@ -217,7 +218,7 @@ export default function Modal({ onClose }: ModalProps) {
                                 <p className="border rounded-md mt-2">
                                     <div className="hover:bg-gray-200 p-1 roundex-md hover:cursor-pointer flex justify-between"
                                         onClick={toggleDropdown}>
-                                        <h3 className="text-lg font-bold text-gray-800">Cab/Hotel Selection</h3>
+                                        <div className="text-lg font-bold text-gray-800">Cab/Hotel Selection</div>
                                         <button
                                             onClick={toggleDropdown}
                                             className="text-gray-600 hover:text-gray-900 text-xl"
@@ -242,7 +243,7 @@ export default function Modal({ onClose }: ModalProps) {
                                                             <td className="border border-gray-300 p-2">
                                                                 <input
                                                                     type="checkbox"
-                                                                    checked={selection[date]?.cab || false}
+                                                                    checked={selection[date]?.cab || true}
                                                                     onChange={() => handleSelectionChange(date, "cab")}
                                                                     className="w-5 h-5"
                                                                 />
@@ -250,7 +251,7 @@ export default function Modal({ onClose }: ModalProps) {
                                                             <td className="border border-gray-300 p-2">
                                                                 <input
                                                                     type="checkbox"
-                                                                    checked={selection[date]?.hotel || false}
+                                                                    checked={selection[date]?.hotel || true}
                                                                     onChange={() => handleSelectionChange(date, "hotel")}
                                                                     className="w-5 h-5"
                                                                 />
@@ -345,12 +346,8 @@ export default function Modal({ onClose }: ModalProps) {
                                 <p className="text-gray-600">📅 <strong className="text-lg underline">Enquiry Received:</strong> Mar 15, 2023</p>
                                 <p className="text-gray-600">👤 <strong className="text-lg underline">Assigned to:</strong> John Doe</p>
                             </div>
-
-                            {/* Notes & Communication */}
-                            <div className="bg-white p-4 rounded-sm shadow border border-gray-400">
-                                <h3 className="text-2xl font-bold text-gray-800">Notes & Communication</h3>
-                                <textarea className="w-full p-2 border rounded-md mt-2 text-gray-600" placeholder="Add a note..."></textarea>
-                                <button className="mt-2 font-bold bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-700">Add Note</button>
+                            <div>
+                                <FollowUp/>
                             </div>
                         </div>
                     </div>
