@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Home, FileText, CheckCircle, User, LogOut, Menu,Baby, ChartLine, SquareUser, Package, MapPinHouse } from "lucide-react";
+import { Home, FileText, CheckCircle, User, LogOut, Menu,Baby, ChartLine, SquareUser, Package, MapPinHouse, CarTaxiFront } from "lucide-react";
 import { useState } from "react";
 
 export default function EmployeeSideBar() {
@@ -13,6 +13,7 @@ export default function EmployeeSideBar() {
     { name: "Dashboard", path: "/Admin", icon: <Home size={20} /> },
     { name: "Employees", path: "/Admin/Employee", icon: <SquareUser size={20} /> },
     { name: "Enquiries", path: "/Admin/Enquiries", icon: <FileText size={20} /> },
+    { name: "Cab", path: "/Admin/Cab", icon: <CarTaxiFront size={20} /> },
     { name: "Follow Ups", path: "/Admin/FollowUps", icon: <CheckCircle size={20} /> },
     { name: "Packages", path: "/Admin/Packages", icon: <Package size={20} /> },
     { name: "Destinations", path: "/Admin/Destinations", icon: <MapPinHouse size={20} /> },
