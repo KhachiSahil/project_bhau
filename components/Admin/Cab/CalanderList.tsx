@@ -1,13 +1,9 @@
-import CalendarComponent from "./CalanderComponent"
-import Enquiries from "./Enquiries"
+import CalendarWithDetails from "./CalanderComponent"
 export default function CalanderList(){
     return (
-        <div className="flex w-full justify-evenly flex-col md:flex-row">
+        <div className="flex w-full justify-evenly flex-row">
             <div>
-                <CalendarComponent />
-            </div>
-            <div>
-                <Enquiries/>
+                <CalendarWithDetails />
             </div>
         </div>
     )
