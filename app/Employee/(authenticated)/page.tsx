@@ -5,8 +5,7 @@ import ConversionRateChart from "@/components/Employee/Dashboard/ConversionRatae
 import { Mail, TrendingUp, PhoneCall, IndianRupee } from "lucide-react";
 import RecentEnquiries from "@/components/Employee/Dashboard/RecentEnquiries";
 import UpcomingFollowUps from "@/components/Employee/Dashboard/UpcomingFollowUps";
-// import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
+
 const statsData = [
   { id: 1, name: "Total Enquiries", total: "124", stats: "+12% from last time", Icon: Mail },
   { id: 2, name: "Conversion Rate", total: "65%", stats: "+5% from last time", Icon: TrendingUp },
@@ -15,11 +14,6 @@ const statsData = [
 ];
 
 export default function Dashboard() {
-    // const router = useRouter()
-    // const {data:session,status} = useSession();
-    // if(status === 'unauthenticated'){
-    //   router.push('/signin')
-    // }
   return (
     <div className="md:p-6 space-y-6">
       {/* Stat Cards */}

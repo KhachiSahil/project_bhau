@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Home, FileText, CheckCircle, User, LogOut, Menu,Baby, ChartLine, SquareUser, Package, MapPinHouse, CarTaxiFront } from "lucide-react";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 export default function EmployeeSideBar() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function EmployeeSideBar() {
             <User size={20} />
             Profile
           </button>
-          <button className="text-red-500 hover:text-red-600">
+          <button onClick={()=>{signOut({callbackUrl : `${process.env.NEXT_PUBLIC_WEBSITE_URL}\signin`})}} className="hover:cursor-pointer text-red-500 hover:text-red-600">
             <LogOut size={20} />
           </button>
         </div>

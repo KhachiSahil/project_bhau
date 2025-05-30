@@ -87,7 +87,7 @@ export const NEXT_AUTH_CONFIG: NextAuthOptions = {
 
     async redirect({baseUrl }) {
      
-      return `${baseUrl}/`;
+      return `${baseUrl}/signin`;
     },
   },
 

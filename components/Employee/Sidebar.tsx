@@ -65,7 +65,7 @@ export default function EmployeeSideBar() {
             <User size={20} />
             Profile
           </button>
-          <button onClick={()=>{signOut({callbackUrl : `${process.env.NEXT_PUBLIC_WEBSITE_URL}\signup`})}} className="text-red-500 hover:text-red-600 hover: cursor-pointer">
+          <button onClick={()=>{signOut({callbackUrl : `${process.env.NEXT_PUBLIC_WEBSITE_URL}\signin`})}} className="text-red-500 hover:text-red-600 hover: cursor-pointer">
             <LogOut size={20} />
           </button>
         </div>
