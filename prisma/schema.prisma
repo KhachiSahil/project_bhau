@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  //output   = "../app/prisma"
 }
 
 datasource db {
@@ -15,18 +8,147 @@ datasource db {
 }
 
 model Admin {
-  id  Int @id @default(autoincrement())
-  Name String @unique
-  Password String
+  id       String @id @default(uuid()) @db.Uuid
+  name     String @unique
+  password String
 }
 
 model Employee {
-  id Int @id @default(autoincrement())
-  Name String @unique
-  PassWord String 
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  password  String
+  phone     String
+  createdAt DateTime @default(now())
+
+  enquiries Enquiry[]
+  followUps FollowUp[]
+
+  @@index([name])
 }
 
-model WebSite {
-  id Int @id @default(autoincrement())
-  Name String @unique
+model Website {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  enquiries Enquiry[]
+}
+
+model Destination {
+  id               String    @id @default(uuid()) @db.Uuid
+  name             String
+  pickupEnquiries  Enquiry[] @relation("PickupLocation")
+  dropEnquiries    Enquiry[] @relation("DropLocation")
+  generalEnquiries Enquiry[] @relation("Destination")
+}
+
+model Enquiry {
+  id           String   @id @default(uuid()) @db.Uuid
+  pickupDate   DateTime
+  dropDate     DateTime
+  adults       Int
+  kids         Int
+  requirements String
+  status       String   @default("Pending")
+  createdAt    DateTime @default(now())
+  quotation    String[]
+
+  pickupLocation   Destination @relation("PickupLocation", fields: [pickupLocationId], references: [id])
+  pickupLocationId String      @db.Uuid
+  dropLocation     Destination @relation("DropLocation", fields: [dropLocationId], references: [id])
+  dropLocationId   String      @db.Uuid
+
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String   @db.Uuid
+
+  website   Website @relation(fields: [websiteId], references: [id])
+  websiteId String  @db.Uuid
+
+  destination   Destination @relation("Destination", fields: [destinationId], references: [id])
+  destinationId String      @db.Uuid
+
+  followUps   FollowUp[]
+  hotels      Hotel[]
+  cabBookings CabBooking[]
+  Customer    Customer     @relation(fields: [customerId], references: [id])
+  customerId  String       @db.Uuid
+
+  @@index([pickupDate, dropDate, employeeId])
+}
+
+model Customer {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  email     String    @unique
+  phone     String    @unique
+  enquiries Enquiry[]
+}
+
+model FollowUp {
+  id        String   @id @default(uuid()) @db.Uuid
+  date      DateTime
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String  @db.Uuid
+
+  enquiry   Enquiry @relation(fields: [enquiryId], references: [id])
+  enquiryId String   @db.Uuid
+
+  @@index([date, employeeId])
+}
+
+model Hotel {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  enquiry   Enquiry? @relation(fields: [enquiryId], references: [id])
+  enquiryId String?  @db.Uuid
+
+  bookingDates HotelBookingDate[]
+}
+
+model HotelBookingDate {
+  id   String   @id @default(uuid()) @db.Uuid
+  date DateTime
+
+  hotel   Hotel  @relation(fields: [hotelId], references: [id])
+  hotelId String   @db.Uuid
+
+  @@index([date])
+}
+
+model CabOwner {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  phone       String
+  bookings    CabBooking[]
+  bookedDates BookedDate[]
+
+  @@index([name])
+}
+
+model CabBooking {
+  id        String   @id @default(uuid()) @db.Uuid
+  enquiry   Enquiry? @relation(fields: [enquiryId], references: [id])
+  enquiryId String?  @db.Uuid
+
+  pickupDate DateTime
+  dropDate   DateTime
+
+  bookedDates BookedDate[]
+  CabOwner    CabOwner     @relation(fields: [cabOwnerId], references: [id])
+  cabOwnerId  String   @db.Uuid
+}
+
+model BookedDate {
+  id           String     @id @default(uuid()) @db.Uuid
+  cabBooking   CabBooking @relation(fields: [cabBookingId], references: [id])
+  cabBookingId String  @db.Uuid
+
+  cabOwner   CabOwner @relation(fields: [cabOwnerId], references: [id])
+  cabOwnerId String  @db.Uuid
+
+  date DateTime
+
+  @@index([cabOwnerId, date])
 }

@@ -7,7 +7,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
             {/* Modal Container */}
             <div className="bg-white shadow-lg rounded-lg w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl relative">
-                
+
                 {/* Close Button (Fixed Position) */}
                 <button
                     className="absolute top-3 right-3 text-gray-600 hover:text-black text-xl hover:cursor-pointer"
@@ -58,7 +58,11 @@ export default function NewQueries({ onClose }: ButtonClick) {
 
                         {/* Arrival Date */}
                         <div className="flex flex-col">
-                            <label className="font-medium">Arrival Date</label>
+                            <label className="font-medium">Pickup Date</label>
+                            <input type="date" className="input-field border border-gray-500 rounded-lg p-2" />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="font-medium">Drop Date</label>
                             <input type="date" className="input-field border border-gray-500 rounded-lg p-2" />
                         </div>
 
@@ -121,15 +125,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         </div>
 
                         {/* Enquired On */}
-                        <div className="flex flex-col">
-                            <label className="font-medium">Enquired On</label>
-                            <select className="input-field border border-gray-500 rounded-lg p-2">
-                                <option>Email</option>
-                                <option>Call</option>
-                                <option>Whatsapp</option>
-                                <option>Online</option>
-                            </select>
-                        </div>
+
 
                         {/* Website */}
                         <div className="flex flex-col">
@@ -141,7 +137,16 @@ export default function NewQueries({ onClose }: ButtonClick) {
                                 <option>LMN</option>
                             </select>
                         </div>
+                        <div className="flex flex-col">
+                            <label className="font-medium">Quotation</label>
+                            <input type="text" placeholder="Rs. 20000" className="input-field border border-gray-500 rounded-lg p-2" />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="font-medium">Requirements</label>
+                            <input type="text" placeholder="ex - Travelling only at night" className="input-field border border-gray-500 rounded-lg p-2" />
+                        </div>
                     </div>
+
 
                     {/* Submit Button */}
                     <div className="mt-6 text-center">
