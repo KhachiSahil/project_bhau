@@ -34,25 +34,25 @@ export const NEXT_AUTH_CONFIG: NextAuthOptions = {
         
         if (role === 'admin') {
           const admin = await prisma.admin.findUnique({
-            where: { Name: name },
+            where: {name },
           });
 
-          if (admin && admin.Password === password) {
+          if (admin && admin.password === password) {
             return {
               id: String(admin.id),
-              name: admin.Name,
+              name: admin.name,
               role: 'admin',
             };
           }
         } else if (role === 'employee') {
           const Employee = await prisma.employee.findUnique({
-            where: { Name: name },
+            where: { name: name },
           });
 
-          if (Employee && Employee.PassWord === password) {
+          if (Employee && Employee.password === password) {
             return {
               id: String(Employee.id),
-              name: Employee.Name,
+              name: Employee.name,
               role: 'employee',
             };
           }

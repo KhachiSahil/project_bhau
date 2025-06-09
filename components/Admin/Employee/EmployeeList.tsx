@@ -1,19 +1,49 @@
+"use client"
 import { LucideSearch, MoreHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const employees = [
-    { name: "Priya Sharma", email: "priya.s@travelcrm.com", role: "Senior Travel Consultant", team: "Luxury", location: "Mumbai", status: "active" },
-    { name: "Rahul Verma", email: "rahul.v@travelcrm.com", role: "Travel Consultant", team: "Adventure", location: "Delhi", status: "active" },
-    { name: "Ananya Patel", email: "ananya.p@travelcrm.com", role: "Travel Consultant", team: "Family", location: "Bangalore", status: "active" },
-    { name: "Vikram Singh", email: "vikram.s@travelcrm.com", role: "Travel Consultant", team: "Business", location: "Chennai", status: "active" },
-    { name: "Neha Gupta", email: "neha.g@travelcrm.com", role: "Team Lead", team: "Luxury", location: "Hyderabad", status: "active" },
-    { name: "Arjun Reddy", email: "arjun.r@travelcrm.com", role: "Team Lead", team: "Adventure", location: "Pune", status: "active" },
-    { name: "Divya Krishnan", email: "divya.k@travelcrm.com", role: "Travel Consultant", team: "Family", location: "Kolkata", status: "inactive" },
-    { name: "Sanjay Mehta", email: "sanjay.m@travelcrm.com", role: "Travel Consultant", team: "Business", location: "Ahmedabad", status: "active" },
-    { name: "Sanjay Mehta", email: "sanjay.m@travelcrm.com", role: "Travel Consultant", team: "Business", location: "Ahmedabad", status: "active" },
-    
-];
+interface employeeData {
+    name: string,
+    phone: string,
+    createdAt: Date
+}
 
 export default function EmployeeTable() {
+    const [employees, setEmployees] = useState<employeeData[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredEmployees, setFilteredEmployees] = useState<employeeData[]>([]);
+
+    useEffect(() => {
+        const filtered = employees.filter((emp) =>
+            emp.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredEmployees(filtered);
+    }, [searchTerm, employees]);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Admin/Employee`, {
+                    method: "GET"
+                })
+                if (!response.ok)
+                    throw new Error("Failed to fetch Employees")
+                const employee = await response.json();
+                setEmployees(employee.data)
+                setFilteredEmployees(employee.data)
+                setLoading(false)
+            } catch (err) {
+                console.error("Error fetching employees:", err);
+            }
+        }
+        fetchData()
+    }, [])
     return (
         <div className=" md:p-8 bg-white rounded-xl shadow-lg w-full">
             {/* Header */}
@@ -24,6 +54,7 @@ export default function EmployeeTable() {
                 </div>
                 <div className="relative md:w-96">
                     <input
+                        onChange={handleSearch}
                         type="text"
                         placeholder="Search employees..."
                         className="pl-12 pr-4 py-3 w-full text-base md:text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
@@ -38,44 +69,33 @@ export default function EmployeeTable() {
                         <thead>
                             <tr className="bg-gray-100 text-left text-gray-600 uppercase font-semibold">
                                 <th className="py-4 px-2 md:px-6 whitespace-nowrap">Employee</th>
-                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Role</th>
-                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Team</th>
-                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Location</th>
-                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Status</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Phone no.</th>
+                                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Created At</th>
                                 <th className="py-4 px-2 md:px-6 whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {employees.map((emp, index) => (
-                                <tr key={index} className="border-t">
-                                    <td className="py-4 px-2 md:px-6">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full" />
-                                            <div>
-                                                <p className="font-bold text-lg md:text-xl">{emp.name}</p>
-                                                <p className="text-gray-500 text-base font-semibold">{emp.email}</p>
+                        { (loading)?
+                            <>Loading...</>:
+                            <tbody>
+                                {filteredEmployees.map((emp, index) => (
+                                    <tr key={index} className="border-t">
+                                        <td className="py-4 px-2 md:px-6">
+                                            <div className="flex items-center space-x-4">
+                                                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full" />
+                                                <div>
+                                                    <p className="font-bold text-lg md:text-xl">{emp.name}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.role}</td>
-                                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.team}</td>
-                                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.location}</td>
-                                    <td className="py-4 px-2 md:px-6">
-                                        <span
-                                            className={`px-4 py-2 text-sm md:text-lg font-semibold rounded-full ${emp.status === "active"
-                                                    ? "bg-black text-white"
-                                                    : "bg-gray-200 text-gray-600"
-                                                }`}
-                                        >
-                                            {emp.status}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-2 md:px-6">
-                                        <MoreHorizontal className="text-gray-500 cursor-pointer" size={26} />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
+                                        </td>
+                                        <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.phone}</td>
+                                        <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">{emp.createdAt.toString()}</td>
+                                        <td className="py-4 px-2 md:px-6">
+                                            <MoreHorizontal className="text-gray-500 cursor-pointer" size={26} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        }
                     </table>
                 </div>
             </div>
