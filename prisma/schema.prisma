@@ -28,13 +28,13 @@ model Employee {
 
 model Website {
   id        String    @id @default(uuid()) @db.Uuid
-  name      String
+  name      String    @unique
   enquiries Enquiry[]
 }
 
 model Destination {
   id               String    @id @default(uuid()) @db.Uuid
-  name             String
+  name             String    @unique
   pickupEnquiries  Enquiry[] @relation("PickupLocation")
   dropEnquiries    Enquiry[] @relation("DropLocation")
   generalEnquiries Enquiry[] @relation("Destination")
@@ -90,10 +90,10 @@ model FollowUp {
   updatedAt DateTime @updatedAt
 
   employee   Employee @relation(fields: [employeeId], references: [id])
-  employeeId String  @db.Uuid
+  employeeId String   @db.Uuid
 
   enquiry   Enquiry @relation(fields: [enquiryId], references: [id])
-  enquiryId String   @db.Uuid
+  enquiryId String  @db.Uuid
 
   @@index([date, employeeId])
 }
@@ -112,14 +112,14 @@ model HotelBookingDate {
   date DateTime
 
   hotel   Hotel  @relation(fields: [hotelId], references: [id])
-  hotelId String   @db.Uuid
+  hotelId String @db.Uuid
 
   @@index([date])
 }
 
 model CabOwner {
   id          String       @id @default(uuid()) @db.Uuid
-  name        String
+  name        String       @unique
   phone       String
   bookings    CabBooking[]
   bookedDates BookedDate[]
@@ -137,16 +137,16 @@ model CabBooking {
 
   bookedDates BookedDate[]
   CabOwner    CabOwner     @relation(fields: [cabOwnerId], references: [id])
-  cabOwnerId  String   @db.Uuid
+  cabOwnerId  String       @db.Uuid
 }
 
 model BookedDate {
   id           String     @id @default(uuid()) @db.Uuid
   cabBooking   CabBooking @relation(fields: [cabBookingId], references: [id])
-  cabBookingId String  @db.Uuid
+  cabBookingId String     @db.Uuid
 
   cabOwner   CabOwner @relation(fields: [cabOwnerId], references: [id])
-  cabOwnerId String  @db.Uuid
+  cabOwnerId String   @db.Uuid
 
   date DateTime
 

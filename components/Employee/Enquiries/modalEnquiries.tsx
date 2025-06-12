@@ -243,7 +243,7 @@ export default function Modal({ onClose }: ModalProps) {
                                                             <td className="border border-gray-300 p-2">
                                                                 <input
                                                                     type="checkbox"
-                                                                    checked={selection[date]?.cab || true}
+                                                                    checked={selection[date]?.cab || false}
                                                                     onChange={() => handleSelectionChange(date, "cab")}
                                                                     className="w-5 h-5"
                                                                 />
@@ -251,7 +251,7 @@ export default function Modal({ onClose }: ModalProps) {
                                                             <td className="border border-gray-300 p-2">
                                                                 <input
                                                                     type="checkbox"
-                                                                    checked={selection[date]?.hotel || true}
+                                                                    checked={selection[date]?.hotel || false}
                                                                     onChange={() => handleSelectionChange(date, "hotel")}
                                                                     className="w-5 h-5"
                                                                 />

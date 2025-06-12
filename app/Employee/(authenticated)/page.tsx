@@ -5,6 +5,7 @@ import ConversionRateChart from "@/components/Employee/Dashboard/ConversionRatae
 import { Mail, TrendingUp, PhoneCall, IndianRupee } from "lucide-react";
 import RecentEnquiries from "@/components/Employee/Dashboard/RecentEnquiries";
 import UpcomingFollowUps from "@/components/Employee/Dashboard/UpcomingFollowUps";
+import { useSearchParams } from "next/navigation";
 
 const statsData = [
   { id: 1, name: "Total Enquiries", total: "124", stats: "+12% from last time", Icon: Mail },
@@ -14,6 +15,10 @@ const statsData = [
 ];
 
 export default function Dashboard() {
+    const params = useSearchParams();
+    const websiteName = params.get('website')
+    localStorage.setItem('website',websiteName||"");
+
   return (
     <div className="md:p-6 space-y-6">
       {/* Stat Cards */}
