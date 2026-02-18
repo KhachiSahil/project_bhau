@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -33,11 +34,13 @@ model Website {
 }
 
 model Destination {
-  id               String    @id @default(uuid()) @db.Uuid
-  name             String    @unique
-  pickupEnquiries  Enquiry[] @relation("PickupLocation")
-  dropEnquiries    Enquiry[] @relation("DropLocation")
-  generalEnquiries Enquiry[] @relation("Destination")
+  id               String      @id @default(uuid()) @db.Uuid
+  name             String      @unique
+  pickupEnquiries  Enquiry[]   @relation("PickupLocation")
+  dropEnquiries    Enquiry[]   @relation("DropLocation")
+  generalEnquiries Enquiry[]   @relation("Destination")
+  pickupItinarary  Itinerary[] @relation("pickupLocation")
+  dropItinerary    Itinerary[] @relation("dropLocation")
 }
 
 model Enquiry {
@@ -128,9 +131,9 @@ model CabOwner {
 }
 
 model CabBooking {
-  id        String   @id @default(uuid()) @db.Uuid
-  enquiry   Enquiry? @relation(fields: [enquiryId], references: [id])
-  enquiryId String?  @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
+  enquiry   Enquiry @relation(fields: [enquiryId], references: [id])
+  enquiryId String  @db.Uuid
 
   pickupDate DateTime
   dropDate   DateTime
@@ -151,4 +154,13 @@ model BookedDate {
   date DateTime
 
   @@index([cabOwnerId, date])
+}
+
+model Itinerary {
+  id               String      @id @default(uuid()) @db.Uuid
+  pickupLocation   Destination @relation("pickupLocation", fields: [pickupLocationId], references: [id])
+  pickupLocationId String      @db.Uuid
+  dropLocation     Destination @relation("dropLocation", fields: [dropLocationId], references: [id])
+  dropLocationId   String      @db.Uuid
+  description      Json
 }

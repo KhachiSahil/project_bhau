@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Home, FileText, CheckCircle, User, LogOut, Menu,Baby, ChartLine, SquareUser, Package, MapPinHouse, CarTaxiFront } from "lucide-react";
+import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu,Baby, ChartLine, SquareUser, CarTaxiFront, TentTree } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 
@@ -16,9 +16,8 @@ export default function EmployeeSideBar() {
     { name: "Enquiries", path: "/Admin/Enquiries", icon: <FileText size={20} /> },
     { name: "Cab", path: "/Admin/Cab", icon: <CarTaxiFront size={20} /> },
     { name: "Follow Ups", path: "/Admin/FollowUps", icon: <CheckCircle size={20} /> },
-    { name: "Packages", path: "/Admin/Packages", icon: <Package size={20} /> },
-    { name: "Destinations", path: "/Admin/Destinations", icon: <MapPinHouse size={20} /> },
-    { name: "Reports", path: "/Admin/Reports", icon: <ChartLine size={20} /> }
+    { name: "Reports", path: "/Admin/Reports", icon: <ChartLine size={20} /> },
+    { name: "Itenary", path: "/Admin/Itenary", icon: <Hammer size={20} /> }
   ];
 
   return (
@@ -38,7 +37,7 @@ export default function EmployeeSideBar() {
         } md:w-80 transition-all duration-300 overflow-hidden`}
       >
         {/* Sidebar Header */}
-        <div className="border-b pb-4 border-gray-300 flex text-4xl px-4 font-serif font-bold mb-6"><Baby size={38}/>Bhauu..</div>
+        <div className="border-b pb-4 border-gray-300 flex text-4xl px-4 font-serif font-bold mb-6"><TentTree size={38}/> Tavistaa</div>
 
         {/* Navigation Links */}
         <nav className="space-y-2 flex-1">

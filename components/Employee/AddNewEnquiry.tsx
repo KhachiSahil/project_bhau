@@ -25,7 +25,7 @@ interface NewQueriesProps {
 }
 
 export default function NewQueries({ onClose }: ButtonClick) {
-    const { data: session, status } = useSession();
+    const { data: session} = useSession();
     const EmployeeId = session?.user.id
 
     const [selection, setSelection] = useState<{ [key: string]: { cab: boolean; hotel: boolean } }>({});

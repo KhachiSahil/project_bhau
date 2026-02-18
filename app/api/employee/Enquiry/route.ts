@@ -162,338 +162,48 @@ export async function GET(req: NextRequest) {
         }
 
         // Find the website by name to get its ID
-        // const website = await prisma.website.findUnique({
-        //     where: { name: websiteName },
-        // });
+        const website = await prisma.website.findUnique({
+            where: { name: websiteName },
+        });
 
-        // if (!website) {
-        //     return NextResponse.json({ error: "Website not found" }, { status: 404 });
-        // }
-        const website = {
-            id : '162ca5cc-3029-4a90-9c31-8bb33a9d9285',
-            name : 'TravelHangouts'
+        if (!website) {
+            return NextResponse.json({ error: "Website not found" }, { status: 404 });
         }
+
         const skip = (page - 1) * limit;
         // Get all enquiries matching the employeeId and websiteId
-        // const [enquiries, totalCount] = await Promise.all([
-        //     prisma.enquiry.findMany({
-        //         where: {
-        //             websiteId: website.id,
-        //             employeeId
-        //         },
-        //         include: {
-        //             Customer: true,
-        //             pickupLocation: true,
-        //             dropLocation: true,
-        //             destination: true,
-        //         },
-        //         orderBy: {
-        //             createdAt: 'desc'
-        //         },
-        //         skip,
-        //         take: limit,
-        //     }),
-        //     prisma.enquiry.count({
-        //         where: {
-        //             employeeId,
-        //             websiteId: website.id
-        //         }
-        //     })
-        // ])
-        // const totalPages = Math.ceil(totalCount / limit);
-        // console.log(enquiries)
-        const dummyData = [
-            {
-                id: '44920628-b4a0-41ed-a295-fdab046d55cf',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Pending',
-                createdAt: new Date('2025-06-11T17:05:06.743Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
+        const [enquiries, totalCount] = await Promise.all([
+            prisma.enquiry.findMany({
+                where: {
+                    websiteId: website.id,
+                    employeeId
                 },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
+                include: {
+                    Customer: true,
+                    pickupLocation: true,
+                    dropLocation: true,
+                    destination: true,
                 },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
+                orderBy: {
+                    createdAt: 'desc'
                 },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-            {
-                id: '1b22a46f-60d6-4dd4-a0ce-6a1d54bfa1ce',
-                pickupDate: new Date('2025-06-03T00:00:00.000Z'),
-                dropDate: new Date('2025-06-13T00:00:00.000Z'),
-                adults: 1,
-                kids: 0,
-                requirements: 'better rooms with window view',
-                status: 'Completed',
-                createdAt: new Date('2025-06-11T17:05:02.741Z'),
-                quotation: ['12345566'],
-                pickupLocationId: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7',
-                dropLocationId: '85d633cc-0c42-418d-a1d2-056e2644d65e',
-                employeeId: 'd59497d2-f38c-4bb0-a23f-4df35f9331dd',
-                websiteId: website.id,
-                destinationId: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca',
-                customerId: '08e792ea-9bc3-420b-8732-f570866958d0',
-                Customer: {
-                    id: '08e792ea-9bc3-420b-8732-f570866958d0',
-                    name: 'sahil',
-                    email: 'sahil@gmail.com',
-                    phone: '98765432',
-                },
-                pickupLocation: { id: '36cc2a4b-42f9-4739-87e6-7f34cb769cb7', name: 'Pathankot' },
-                dropLocation: { id: '85d633cc-0c42-418d-a1d2-056e2644d65e', name: 'Kullu' },
-                destination: { id: 'fd742e3c-9d8e-46eb-89c2-93892d02f3ca', name: 'Shimla' },
-            },
-        ];
-        console.log(page)
+                skip,
+                take: limit,
+            }),
+            prisma.enquiry.count({
+                where: {
+                    employeeId,
+                    websiteId: website.id
+                }
+            })
+        ])
+        const totalPages = Math.ceil(totalCount / limit);
+        console.log(enquiries)
+        
+        console.log("Fired backend api...")
         return NextResponse.json({
             // data: enquiries, page, totalPages, totalCount,,
-            enquiries  :dummyData,
+            enquiries,
             hasPrevPage: 0 > 1,
             hasNextPage: 2 < 3
         }, { status: 200 });

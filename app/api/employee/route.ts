@@ -36,19 +36,21 @@ export async function POST(req: NextRequest) {
 }
 
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const name = searchParams.get('name');
+// this is the get request to get admin data
+// export async function GET(req: NextRequest) {
+//   const { searchParams } = new URL(req.url);
+//   const name = searchParams.get('name');
 
-  if (!name) {
-    return NextResponse.json({ error: 'Name is required' }, { status: 400 });
-  }
+//   if (!name) {
+//     return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+//   }
 
-  const user = await prisma.admin.findUnique({
-    where: {
-      name,
-    },
-  });
+//   const user = await prisma.admin.findUnique({
+//     where: {
+//       name,
+//     },
+//   });
 
-  return NextResponse.json({ msg: user }, { status: 200 });
-}
+//   return NextResponse.json({ msg: user }, { status: 200 });
+// }
+

@@ -1,8 +1,19 @@
-"use client"
 import { useState } from "react";
+interface FollowUp {
+    id: string;
+    date: string;
+    message: string;
+    createdAt: string;
+    updatedAt: string;
+    employeeId: string;
+    enquiryId: string;
+}
 
-export default function TodaySchedule() {
-    const [followUps] = useState<string[]>([]);
+interface CalendarComponentProps {
+    followUps: FollowUp[];
+}
+export default function TodaySchedule({followUps}:CalendarComponentProps) {
+    const [followups] = useState<string[]>([]);
 
     // Get today's date
     const today = new Date();
@@ -24,7 +35,7 @@ export default function TodaySchedule() {
             <div className="mt-2">
                 {followUps.length > 0 ? (
                     <ul className="list-disc pl-5 space-y-2">
-                        {followUps.map((followUp, index) => (
+                        {followups.map((followUp, index) => (
                             <li key={index} className="text-gray-800 font-medium">
                                 {followUp}
                             </li>
