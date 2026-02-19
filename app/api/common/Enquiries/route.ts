@@ -174,6 +174,7 @@ export async function POST(req: NextRequest) {
       await prisma.bookedDate.deleteMany({ where: { cabBookingId: cabRow.id } });
       if (cabSrc.CabOwner.bookedDates?.length) {
         await prisma.bookedDate.createMany({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data: cabSrc.CabOwner.bookedDates.map((bd: any) => ({
             cabBookingId: cabRow.id,
             cabOwnerId: cabSrc.CabOwner.id,
@@ -201,6 +202,7 @@ export async function POST(req: NextRequest) {
 
       if (h.bookingDates?.length) {
         await prisma.hotelBookingDate.createMany({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data: h.bookingDates.map((bd: any) => ({
             hotelId: hotelRow.id,
             date: new Date(bd.date),
@@ -216,6 +218,7 @@ export async function POST(req: NextRequest) {
 
     if (followUps.length) {
       await prisma.followUp.createMany({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: followUps.map((f: any) => ({
           enquiryId: enquiryRow.id,
           date: new Date(f.date),

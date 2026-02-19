@@ -108,7 +108,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
         hotels: updatedHotels,
       };
     });
-  }, [data?.pickupDate, data?.dropDate]);
+  }, [data?.pickupDate, data?.dropDate,data?.hotels]);
 
 
   //to maintain data between bounds
@@ -136,7 +136,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       });
     }
 
-  }, [data?.pickupDate, data?.dropDate]);
+  }, [data?.pickupDate, data?.dropDate,data?.cabBookings]);
 
   // Toggle cab or hotel booking on a date
   const handleToggleBooking = (date: string, type: "cab" | "hotel") => {
@@ -258,7 +258,6 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
     const updatedHotels = [...data.hotels];
 
     // Step 1: Find the hotel and booking that currently holds the date
-    let fromHotelIndex = -1;
     let bookingToMove = null;
 
     for (let i = 0; i < updatedHotels.length; i++) {
@@ -266,7 +265,6 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
         (bd) => bd.date.split("T")[0] === date
       );
       if (index !== -1) {
-        fromHotelIndex = i;
         bookingToMove = updatedHotels[i].bookingDates[index];
         // Step 2: Remove the booking from this hotel
         updatedHotels[i].bookingDates.splice(index, 1);

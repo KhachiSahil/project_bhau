@@ -12,14 +12,14 @@ const statsData = [
   { id: 4, name: "Revenue Generated", total: "₹1,20,000", stats: "+15% from last time", Icon: IndianRupee },
 ];
 export default function Dashboard() {
-  const {data : session, status} = useSession();
+  const {data : session} = useSession();
   const params = useSearchParams();
   useEffect(() => {
     const websiteName = params.get('website')
     console.log(websiteName)
     if (websiteName !== null)
       localStorage.setItem('website', websiteName || "");
-  }, [])
+  }, [session,params])
 
   return (
     <div className="md:p-6 space-y-6">

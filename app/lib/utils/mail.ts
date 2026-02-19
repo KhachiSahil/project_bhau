@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function sendCompletionEmail(to: string, enquiry: any) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',

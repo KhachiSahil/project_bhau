@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
 
         // 5. Create CabBooking if any cab days selected
         const cabDates: string[] = Object.entries(selection)
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, value]) => (value as { cab?: boolean }).cab)
             .map(([date]) => date);
 
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
                     cabOwnerId: cabOwnerData.id,
                 },
             });
-
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             cabBookingId = cabBooking.id;
 
             const bookedDates = cabDates.map((dateStr) => ({
@@ -198,7 +199,7 @@ export async function GET(req: NextRequest) {
             })
         ])
         const totalPages = Math.ceil(totalCount / limit);
-        console.log(enquiries)
+        console.log(enquiries,totalPages)
         
         console.log("Fired backend api...")
         return NextResponse.json({

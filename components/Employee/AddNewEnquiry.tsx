@@ -94,7 +94,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
     const handleSubmit = async (e: FormEvent<HTMLButtonElement>) => {
         try {
             e.preventDefault();
-            const responnse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Enquiry`, {
+            await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Enquiry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
             }
             )
         } catch (err) {
-
+            console.log(err)
         }
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu,Baby, ChartLine, SquareUser, CarTaxiFront, TentTree } from "lucide-react";
+import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, TentTree } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 

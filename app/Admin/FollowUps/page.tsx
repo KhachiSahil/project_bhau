@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 
 export default function FollowUps() {
         const [followups,setFollowups] = useState([]);
-        const {data : session , status} = useSession();
+        const {data : session} = useSession();
         useEffect(()=>{
             async function getFollowUps(){
                 const data = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/FollowUps?empId=${session?.user.id}`)
@@ -14,7 +14,7 @@ export default function FollowUps() {
                 setFollowups(fetchedData.followUps)
             }
             getFollowUps();
-        },[])
+        },[session])
     return (
         <div className="flex flex-col md:flex-row gap-5 w-full">
             <div className="flex flex-col gap-5 ">

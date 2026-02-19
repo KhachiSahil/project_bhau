@@ -23,6 +23,7 @@ const tabs: { label: string; status?: StatusType }[] = [
 export default function Enquiries() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [selectedTab, setSelectedTab] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");

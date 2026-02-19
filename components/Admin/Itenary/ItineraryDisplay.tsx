@@ -43,7 +43,6 @@ export const ItineraryModal: React.FC<ModalProps> = ({ show, onClose, formData }
 
   const {
     arrivalDate,
-    endDate,
     destination,
     pickupPlace,
     dropPlace,
@@ -63,9 +62,6 @@ export const ItineraryModal: React.FC<ModalProps> = ({ show, onClose, formData }
     
     return `${getOrdinal(day)} ${month} ${year}`;
   };
-
-  const formattedArrival = formatDate(arrivalDate);
-  const formattedEnd = formatDate(endDate);
 
   const calculateDistance = (from: string, to: string) => {
     // Sample distance calculations - you can replace with actual logic

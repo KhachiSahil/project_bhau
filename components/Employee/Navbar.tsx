@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { ArrowLeftRight, Bell, BellDot, Columns2, Plus } from "lucide-react";
+import { ArrowLeftRight, Bell, Columns2, Plus } from "lucide-react";
 import NewQueries from "./AddNewEnquiry";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
