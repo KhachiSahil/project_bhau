@@ -158,6 +158,7 @@ model BookedDate {
 
 model Itinerary {
   id               String      @id @default(uuid()) @db.Uuid
+  days             String
   pickupLocation   Destination @relation("pickupLocation", fields: [pickupLocationId], references: [id])
   pickupLocationId String      @db.Uuid
   dropLocation     Destination @relation("dropLocation", fields: [dropLocationId], references: [id])
