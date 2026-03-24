@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 model Admin {
@@ -156,10 +156,11 @@ model BookedDate {
 
 model Itinerary {
   id               String      @id @default(uuid()) @db.Uuid
-  days             String
+  days             Int
   pickupLocation   Destination @relation("pickupLocation", fields: [pickupLocationId], references: [id])
   pickupLocationId String      @db.Uuid
   dropLocation     Destination @relation("dropLocation", fields: [dropLocationId], references: [id])
   dropLocationId   String      @db.Uuid
   description      Json
+  @@unique([pickupLocationId,dropLocationId,days])
 }
