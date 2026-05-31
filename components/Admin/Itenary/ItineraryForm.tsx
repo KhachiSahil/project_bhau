@@ -53,13 +53,20 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({ formData, onChange, onSub
         onChange={onChange}
         placeholder="e.g., Chandigarh Railway Station"
       />
-
-      <button
-        onClick={onSubmit}
-        className="w-full mt-4 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-900"
-      >
-        Generate Itinerary
-      </button>
+      <div className='flex gap-2'>
+        <button
+          onClick={onSubmit}
+          className="w-full mt-4 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-900"
+        >
+          View Itinerary
+        </button>
+        <button
+          onClick={onSubmit}
+          className="w-full mt-4 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-900"
+        >
+          Generate Itinerary
+        </button>
+      </div>
     </div>
   );
 };

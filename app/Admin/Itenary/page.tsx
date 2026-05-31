@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import ItineraryForm, { FormData } from '@/components/Admin/Itenary/ItineraryForm';
-import {ItineraryModal} from '@/components/Admin/Itenary/ItineraryDisplay';
+import GenerateItenary from '@/components/Admin/Itenary/GenerateItenary';
 
 const Itinerary: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -36,7 +36,7 @@ const Itinerary: React.FC = () => {
       </div>
 
       {/* Modal for displaying the final itinerary */}
-      <ItineraryModal show={showModal} onClose={() => setShowModal(false)} formData={formData} />
+      <GenerateItenary show={showModal} onClose = {()=>setShowModal(false)} formData={formData}/>
     </div>
   );
 };

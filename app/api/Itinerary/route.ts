@@ -1,6 +1,6 @@
 import prisma from "@/db";
 import { NextRequest, NextResponse } from "next/server";
-import differenceInDays from "date-fns/differenceInDays";
+import {differenceInDays} from "date-fns/differenceInDays";
 
 export async function POST(req: NextRequest) {
     try {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
             vehicle,
             data
         } = body;
-
+        console.log(body)
         // Validation
         if (!pickupDate || !dropDate || !pickupLocation || !dropLocation || 
             budget === undefined || adults === undefined || kids === undefined || 
