@@ -1,7 +1,8 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ItineraryForm, { FormData } from '@/components/Admin/Itenary/ItineraryForm';
 import GenerateItenary from '@/components/Admin/Itenary/GenerateItenary';
+import ViewItenary from '@/components/Admin/Itenary/ViewItenary';
 
 const Itinerary: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -12,17 +13,19 @@ const Itinerary: React.FC = () => {
     dropPlace: '',
   });
 
-  const [showModal, setShowModal] = useState(false);
+  const [showGenerateItenary, setShowGenerateItenary] = useState(false);
+  const [Itenary, setItenary] = useState<"View" | "Generate"| undefined>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (value: "View" | "Generate") => {
     const { arrivalDate, endDate, destination, pickupPlace, dropPlace } = formData;
     if (arrivalDate && endDate && destination && pickupPlace && dropPlace) {
-      setShowModal(true);
+      setItenary(value)
+      setShowGenerateItenary(true);
     } else {
       alert('Please fill all fields.');
     }
@@ -36,7 +39,8 @@ const Itinerary: React.FC = () => {
       </div>
 
       {/* Modal for displaying the final itinerary */}
-      <GenerateItenary show={showModal} onClose = {()=>setShowModal(false)} formData={formData}/>
+      {(Itenary == "Generate") && showGenerateItenary && <GenerateItenary onClose={() => setShowGenerateItenary(false)} formData={formData} />}
+      {(Itenary == "View") && showGenerateItenary && <ViewItenary onClose={() => setShowGenerateItenary(false)} formData={formData} />}
     </div>
   );
 };

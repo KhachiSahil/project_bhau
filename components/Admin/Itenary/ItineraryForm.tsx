@@ -12,7 +12,7 @@ export interface FormData {
 interface ItineraryFormProps {
   formData: FormData;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: () => void;
+  onSubmit: (value : "View" | "Generate") => void;
 }
 
 const ItineraryForm: React.FC<ItineraryFormProps> = ({ formData, onChange, onSubmit }) => {
@@ -55,13 +55,13 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({ formData, onChange, onSub
       />
       <div className='flex gap-2'>
         <button
-          onClick={onSubmit}
+          onClick={()=>onSubmit("View")}
           className="w-full mt-4 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-900"
         >
           View Itinerary
         </button>
         <button
-          onClick={onSubmit}
+          onClick={()=>onSubmit("Generate")}
           className="w-full mt-4 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-900"
         >
           Generate Itinerary

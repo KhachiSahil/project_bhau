@@ -1,9 +1,8 @@
-import { differenceInDays } from "date-fns";
-import { X, Edit3, Save, Users, Car, Phone, Download, Plus, Trash2 } from "lucide-react";
+import { X, Edit3, Save, Users, Car, Phone, Download} from "lucide-react";
 import { useState } from "react";
-import { DEFAULT_NOTES, buildDays, exportToPDF } from "./Itenary-export-data"
+import { DEFAULT_NOTES, exportToPDF } from "./Itenary-export-data"
 
-export default function GenerateItenary({onClose, formData }: any) {
+export default function ViewItineraryHelper({onClose, formData }: any) {
   const { arrivalDate, endDate, destination, pickupPlace, dropPlace } = formData;
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState(DEFAULT_NOTES);
@@ -18,63 +17,18 @@ export default function GenerateItenary({onClose, formData }: any) {
     greeting: "Dear Sir,",
   });
 
-  const totalDays = differenceInDays(new Date(endDate), new Date(arrivalDate)) + 1;
-  const daysData = buildDays(arrivalDate, totalDays, pickupPlace, destination, dropPlace)
-  const [itineraryDays, setItineraryDays] = useState(daysData);
+  const [itineraryDays, setItineraryDays] = useState(formData.description);
 
   const handleEditChange = (field: string, value: string) =>
     setEditableContent((prev) => ({ ...prev, [field]: value }));
 
   const updateDay = (index: number, field: string, value: string) =>
-    setItineraryDays((prev) =>
-      prev.map((d, i) => (i === index ? { ...d, [field]: value } : d))
-    );
-
-  const addDay = () => {
-    const last = itineraryDays[itineraryDays.length - 1];
-    setItineraryDays((prev) => [
-      ...prev,
-      {
-        day: prev.length + 1,
-        date: last.date,
-        title: `${destination} Local Sightseeing`,
-        description: `Today after breakfast we will take you to visit famous attractions in ${destination}. Overnight stay at Hotel.`,
-      },
-    ]);
-  };
-
-  const removeDay = (index: number) =>
-    setItineraryDays((prev) =>
-      prev.filter((_, i) => i !== index).map((d, i) => ({ ...d, day: i + 1 }))
+    setItineraryDays((prev:any) =>
+      prev.map((d:any, i:any) => (i === index ? { ...d, [field]: value } : d))
     );
 
   const updateNote = (i: number, value: string) =>
     setNotes((prev) => prev.map((n, idx) => (idx === i ? value : n)));
-
-  const handleItinerarySave = async () => {
-    try {
-      const data = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Itinerary`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            pickupDate: arrivalDate,
-            dropDate: endDate,
-            pickupLocation: pickupPlace,
-            dropLocation: dropPlace,
-            destination: destination,
-            budget: editableContent.transportationCost,
-            adults: editableContent.adults,
-            kids: editableContent.children,
-            vehicle: editableContent.vehicle,
-            data: daysData.map(({ date, ...rest }) => rest)
-          })
-        }
-      )
-      console.log(data);
-    }catch(err){
-      console.log(err)
-    }
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-60 p-4">
@@ -87,13 +41,6 @@ export default function GenerateItenary({onClose, formData }: any) {
             <p className="text-gray-300 mt-1">Himachal Taxi Rental Service</p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={()=>{handleItinerarySave(),onClose()}}
-              className={`flex items-center gap-2 px-4 py-2  text-white rounded transition-colors text-sm font-medium ${isEditing ? "bg-gray-800 cursor-not-allowed" : "bg-green-900  hover:bg-green-700 "}`}
-              disabled={isEditing}
-            >
-              <><Save size={16} /> Save</>
-            </button>
             <button
               onClick={() => exportToPDF(editableContent, itineraryDays, notes)}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium"
@@ -135,13 +82,13 @@ export default function GenerateItenary({onClose, formData }: any) {
           <div>
             <h3 className="font-bold text-xl mb-4">Itinerary:</h3>
             <div className="space-y-6">
-              {itineraryDays.map((day, index) => (
+              {itineraryDays.map((day:any, index:number) => (
                 <div key={index} className="border-l-4 border-black pl-4">
                   {isEditing ? (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-sm shrink-0">
-                          Day {String(day.day).padStart(2, "0")}: {day.date} ~
+                          Day {String(day.day).padStart(2, "0")}:  ~
                         </span>
                         <input
                           type="text"
@@ -149,14 +96,6 @@ export default function GenerateItenary({onClose, formData }: any) {
                           onChange={(e) => updateDay(index, "title", e.target.value)}
                           className="flex-1 font-bold border-b border-gray-300 outline-none text-sm"
                         />
-                        {itineraryDays.length > 1 && (
-                          <button
-                            onClick={() => removeDay(index)}
-                            className="text-gray-400 hover:text-red-500 transition-colors shrink-0"
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        )}
                       </div>
                       <textarea
                         value={day.description}
@@ -168,7 +107,7 @@ export default function GenerateItenary({onClose, formData }: any) {
                   ) : (
                     <>
                       <h4 className="font-bold text-lg mb-2">
-                        Day {String(day.day).padStart(2, "0")}: {day.date} ~ {day.title}
+                        Day {String(day.day).padStart(2, "0")}:~ {day.title}
                       </h4>
                       <p className="text-gray-800 leading-relaxed">{day.description}</p>
                     </>
@@ -176,15 +115,6 @@ export default function GenerateItenary({onClose, formData }: any) {
                 </div>
               ))}
             </div>
-
-            {isEditing && (
-              <button
-                onClick={addDay}
-                className="mt-4 flex items-center gap-1 px-3 py-1.5 text-sm border border-black rounded hover:bg-black hover:text-white transition-colors"
-              >
-                <Plus size={14} /> Add Day
-              </button>
-            )}
           </div>
 
           {/* Transportation */}

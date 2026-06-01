@@ -39,6 +39,7 @@ model Destination {
   generalEnquiries Enquiry[]   @relation("Destination")
   pickupItinarary  Itinerary[] @relation("pickupLocation")
   dropItinerary    Itinerary[] @relation("dropLocation")
+  destination      Itinerary[] @relation("destination")
 }
 
 model Enquiry {
@@ -161,6 +162,9 @@ model Itinerary {
   pickupLocationId String      @db.Uuid
   dropLocation     Destination @relation("dropLocation", fields: [dropLocationId], references: [id])
   dropLocationId   String      @db.Uuid
+  destination      Destination @relation("destination", fields: [destinationId], references: [id])
+  destinationId    String      @db.Uuid
   description      Json
-  @@unique([pickupLocationId,dropLocationId,days])
+
+  @@unique([pickupLocationId, dropLocationId, destinationId, days])
 }
