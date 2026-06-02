@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { data } = await req.json();
+    const { data, followUps = [] } = await req.json();
 
     const {
       id,
@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
       status,
       cabBookings = [],
       hotels = [],
-      followUps = [],
       employeeId,
       websiteId,
     } = data;
@@ -214,7 +213,7 @@ export async function POST(req: NextRequest) {
     /* ------------------------------------------------- *
      * Follow‑ups ‑ replace‑all
      * ------------------------------------------------- */
-    await prisma.followUp.deleteMany({ where: { enquiryId: enquiryRow.id } });
+    // await prisma.followUp.deleteMany({ where: { enquiryId: enquiryRow.id } });
 
     if (followUps.length) {
       await prisma.followUp.createMany({
@@ -222,20 +221,22 @@ export async function POST(req: NextRequest) {
         data: followUps.map((f: any) => ({
           enquiryId: enquiryRow.id,
           date: new Date(f.date),
-          message: f.note ?? "",
+          message: f.message ?? "",
           employeeId
         })),
       });
     }
 
+
+
     if (status === "Completed" && oldEnquiry?.status !== "Completed")
-        await sendCompletionEmail(customerRow.email,enquiryRow)
+      await sendCompletionEmail(customerRow.email, enquiryRow)
 
 
-      return NextResponse.json(
-        { message: "Enquiry saved / updated", enquiryId: enquiryRow.id },
-        { status: 200 },
-      );
+    return NextResponse.json(
+      { message: "Enquiry saved / updated", enquiryId: enquiryRow.id },
+      { status: 200 },
+    );
   } catch (err) {
     console.error("POST /api/common/Enquiries error:", err);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });

@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -73,7 +74,7 @@ model Enquiry {
   Customer    Customer     @relation(fields: [customerId], references: [id])
   customerId  String       @db.Uuid
 
-  @@index([pickupDate, dropDate, employeeId])
+  @@index([pickupDate, dropDate, employeeId,customerId,destinationId,websiteId,dropLocationId,pickupLocationId])
 }
 
 model Customer {
@@ -97,7 +98,7 @@ model FollowUp {
   enquiry   Enquiry @relation(fields: [enquiryId], references: [id])
   enquiryId String  @db.Uuid
 
-  @@index([date, employeeId])
+  @@index([date, employeeId,enquiryId])
 }
 
 model Hotel {
@@ -107,6 +108,7 @@ model Hotel {
   enquiryId String?  @db.Uuid
 
   bookingDates HotelBookingDate[]
+  @@index([enquiryId])
 }
 
 model HotelBookingDate {
@@ -116,7 +118,7 @@ model HotelBookingDate {
   hotel   Hotel  @relation(fields: [hotelId], references: [id])
   hotelId String @db.Uuid
 
-  @@index([date])
+  @@index([date,hotelId])
 }
 
 model CabOwner {
@@ -140,6 +142,7 @@ model CabBooking {
   bookedDates BookedDate[]
   CabOwner    CabOwner     @relation(fields: [cabOwnerId], references: [id])
   cabOwnerId  String       @db.Uuid
+  @@index([cabOwnerId, enquiryId])
 }
 
 model BookedDate {
@@ -152,7 +155,7 @@ model BookedDate {
 
   date DateTime
 
-  @@index([cabOwnerId, date])
+  @@index([cabOwnerId, date,cabBookingId])
 }
 
 model Itinerary {

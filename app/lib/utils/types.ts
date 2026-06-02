@@ -63,7 +63,7 @@ export interface dataModalProps {
   followUps: {
     id: string;
     date: string;
-    note: string;
+    message: string;
   }[];
 }
 export type ModalProps = {

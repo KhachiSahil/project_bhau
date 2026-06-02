@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -10,11 +8,14 @@ type Value = Date | null | [Date, Date];
 export interface FollowUp {
   id: string;
   date: string;       // ISO
-  note: string;
+  message: string;
   createdAt: string;  // ISO
   updatedAt: string;  // ISO
   employeeId: string;
   enquiryId: string;
+  employee?: {
+    name : string
+  }
 }
 
 interface CalendarComponentProps {
@@ -79,19 +80,19 @@ export default function CalendarComponent({ followUps }: CalendarComponentProps)
       </div>
 
       {/* follow‑up list */}
-      <section className="mt-4 p-4 bg-gray-50 border rounded-md max-h-60 overflow-auto">
+      <section className="mt-4 border-x-3 bg-gray-50 border rounded-md max-h-60 overflow-auto">
         {todays.length ? (
           <ul className="space-y-3">
             {todays.map((fu) => (
               <li key={fu.id} className="p-3 bg-white border rounded shadow-sm">
-                <p className="text-sm text-gray-500 mb-1">
-                  Enquiry&nbsp;ID: <span className="font-mono">{fu.enquiryId}</span>
-                </p>
-                <p className="text-gray-700">message{fu.note}</p>
+                <p className="text-gray-500 font-bold  text-sm"><span className="font-bold text-black text-base">Message:</span> {fu.message}</p>
 
-                <div className="mt-2 text-xs text-gray-500 space-x-2">
-                  <span>Employee: {fu.employeeId}</span>
-                </div>
+                <p className="text-sm font-bold mb-1">
+                  Enquiry&nbsp;ID: <span className="font-mono text-xs text-gray-500">{fu.enquiryId}</span>
+                </p>
+                <p className="text-sm  font-bold mb-1">
+                  Employee: <span className="font-mono text-gray-500 text-xs">{fu.employee?.name}</span>
+                </p>
               </li>
             ))}
           </ul>

@@ -77,12 +77,13 @@ export default function Enquiries() {
       setPage(1);
     };
   }, [status]);
-
+  console.log(enquiries)
   // Filtered Enquiries Based on Tab & Search
   const filteredEnquiries = useMemo(() => {
     return enquiries.filter((enquiry) => {
       const matchStatus = selectedTab === "All" || enquiry.status === selectedTab;
       const matchSearch =
+        enquiry.id.toLowerCase().includes(searchQuery.toLowerCase())||
         enquiry.Customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         enquiry.Customer?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         enquiry.Customer?.phone?.includes(searchQuery);

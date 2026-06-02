@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, TentTree } from "lucide-react";
+import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, Baby } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 
@@ -37,7 +37,7 @@ export default function EmployeeSideBar() {
         } md:w-80 transition-all duration-300 overflow-hidden`}
       >
         {/* Sidebar Header */}
-        <div className="border-b pb-4 border-gray-300 flex text-4xl px-4 font-serif font-bold mb-6"><TentTree size={38}/> Tavistaa</div>
+        <div className="border-b pb-4 border-gray-300 flex text-4xl px-4 font-serif font-bold mb-6"><Baby size={38}/>Bhauu..</div>
 
         {/* Navigation Links */}
         <nav className="space-y-2 flex-1">

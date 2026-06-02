@@ -6,6 +6,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
   const [data, setData] = useState<dataModalProps>();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [followUps, setFollowUps] = useState<Array<{ id: string; date: string; message: string }>>([])
 
   // Example hotel options
   const hotels = ["N/A", "Oberoi", "Taj", "Cecil"];
@@ -108,7 +109,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
         hotels: updatedHotels,
       };
     });
-  }, [data?.pickupDate, data?.dropDate,data?.hotels]);
+  }, [data?.pickupDate, data?.dropDate, data?.hotels]);
 
 
   //to maintain data between bounds
@@ -117,8 +118,8 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
     if (newDates) {
       const cabBooking = newDates;
       const newBookedDates = cabBooking.CabOwner.bookedDates.filter((bd) => {
-        return bd.date.split("T")[0] >= data.pickupDate.split("T")[0] && 
-        bd.date.split("T")[0] <= data.dropDate.split("T")[0]
+        return bd.date.split("T")[0] >= data.pickupDate.split("T")[0] &&
+          bd.date.split("T")[0] <= data.dropDate.split("T")[0]
       });
       setData((prev) => {
         if (!prev) return prev;
@@ -136,7 +137,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       });
     }
 
-  }, [data?.pickupDate, data?.dropDate,data?.cabBookings]);
+  }, [data?.pickupDate, data?.dropDate, data?.cabBookings]);
 
   // Toggle cab or hotel booking on a date
   const handleToggleBooking = (date: string, type: "cab" | "hotel") => {
@@ -330,17 +331,17 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
     const newFollowUp = {
       id: `${Date.now()}`, // Use timestamp as ID
       date,
-      note,
+      message : note,
     };
-
+    
     setData((prev) => {
       if (!prev) return prev;
-
       return {
         ...prev,
         followUps: [newFollowUp, ...(prev.followUps || [])], // prepend new follow-up
       };
     });
+    setFollowUps(prev => [newFollowUp, ...prev]);
   }
 
   // Edit mode handlers
@@ -360,7 +361,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ data }),
+          body: JSON.stringify({ data,followUps }),
         }
       );
 
@@ -370,7 +371,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
         console.error("Failed to save data:", result?.message || result);
         alert("Failed to save enquiry data.");
       } else {
-        console.log(" Data saved successfully:", result); 
+        console.log(" Data saved successfully:", result);
       }
     } catch (err) {
       console.error("Error saving data:", err);

@@ -22,7 +22,7 @@ export default function EmployeeNavbar() {
                 {/* Add Enquiry Button */}
                 <div className="justify-end flex w-full mr-10 md:mr-0">
                     <div className="flex gap-3 my-auto mr-3">
-                        <div className="hover:bg-gray-400 rounded-md p-2 hover:cursor-pointer"><Bell /> </div>
+                        {/* <div className="hover:bg-gray-400 rounded-md p-2 hover:cursor-pointer"><Bell /> </div> */}
                         <div onClick={()=>{router.push('/Employee/Website')}} className="hover:bg-gray-400 rounded-md p-2 hover:cursor-pointer"><ArrowLeftRight /></div>
                     </div>
                     <button

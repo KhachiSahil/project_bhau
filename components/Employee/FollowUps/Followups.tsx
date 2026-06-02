@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
@@ -8,12 +6,15 @@ import { Search } from "lucide-react";
  * -------------------------------------------------- */
 interface FollowUp {
   id: string;
-  date: string;            // ISO‑8601
+  date: string;
   message: string;
   createdAt: string;
   updatedAt: string;
   employeeId: string;
   enquiryId: string;
+  employee?: {
+    name: string
+  }
 }
 
 interface FollowUpsProps {
@@ -38,7 +39,7 @@ function isUpcomingUTC(dateISO: string): boolean {
 export default function FollowUps({ followUps }: FollowUpsProps) {
   const [activeTab, setActiveTab] = useState<"All" | "Upcoming">("All");
   const [search, setSearch] = useState("");
-
+  console.log(followUps)
   /* ---------- pre‑process list once ------------- */
   const processed = useMemo(
     () =>
@@ -90,11 +91,10 @@ export default function FollowUps({ followUps }: FollowUpsProps) {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-lg font-semibold ${
-              activeTab === tab
-                ? "border-b-2 border-black text-black"
-                : "text-gray-500"
-            }`}
+            className={`pb-2 text-lg font-semibold ${activeTab === tab
+              ? "border-b-2 border-black text-black"
+              : "text-gray-500"
+              }`}
           >
             {tab}
           </button>
@@ -107,13 +107,16 @@ export default function FollowUps({ followUps }: FollowUpsProps) {
           visible.map((fu) => (
             <div
               key={fu.id}
-              className="flex flex-col sm:flex-row gap-y-1 sm:gap-0 sm:items-center justify-between p-4 border-b last:border-none hover:bg-gray-50"
+              className="p-2 gap-1 border-b last:border-none hover:bg-gray-50"
             >
-              <p className="font-bold text-gray-800">{fu.dateOnly}</p>
+              <div className="font-bold text-black">Employee: <span className="font-normal text-gray-800">{fu?.employee?.name}</span></div>
+              <div className="flex  flex-col sm:flex-row  sm:items-center justify-between">
+                <p className="w-1/3 font-bold text-sm text-gray-800">{fu.dateOnly}</p>
 
-              <p className="text-gray-700 sm:w-1/2">{fu.message}</p>
+                <p className="text-gray-700 sm:w-1/2">{fu.message}</p>
 
-              <p className="text-gray-500 text-sm sm:text-base">{fu.enquiryId}</p>
+                <p className="text-gray-500 text-xs ">{fu.enquiryId}</p>
+              </div>
             </div>
           ))
         ) : (

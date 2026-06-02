@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { Bell, Columns2 } from "lucide-react";
 import { useState } from "react";
+import NotificationCOmponent from "../NotificationComponent";
 
 export default function EmployeeNavbar() {
     const pathname = usePathname().split("/").filter(Boolean);
@@ -21,9 +22,10 @@ export default function EmployeeNavbar() {
                     onClick={() => setIsOpen(!isOpen)}
                     className=" hover:bg-gray-700 hover:cursor-pointer transition duration-150 hover:text-white  p-2 text-sm md:p-3 md:text-lg font-bold rounded-lg"
                 >
-                    <Bell size={20} />
+                    {/* <Bell size={20} /> */}
                 </button>
             </div>
+            {isOpen && <NotificationCOmponent onClose={()=>setIsOpen(false)}/>}
         </div>
     );
 }

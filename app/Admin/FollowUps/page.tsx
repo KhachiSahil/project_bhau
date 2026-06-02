@@ -9,7 +9,7 @@ export default function FollowUps() {
         const {data : session} = useSession();
         useEffect(()=>{
             async function getFollowUps(){
-                const data = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/FollowUps?empId=${session?.user.id}`)
+                const data = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Admin/FollowUps `)
                 const fetchedData = await data.json()
                 setFollowups(fetchedData.followUps)
             }

@@ -3,7 +3,7 @@ import { useState } from "react";
 interface FollowUpItem {
   id: string;
   date: string;
-  note: string;
+  message: string;
 }
 
 interface FollowUpProps {
@@ -65,7 +65,7 @@ export default function FollowUp({
               <li key={index} className="p-2 bg-white border rounded shadow-sm">
                 <strong className="text-blue-600">Date:</strong>{" "}
                 {followUp.date.split("T")[0]} <br />
-                <span className="text-gray-700">{followUp.note}</span>
+                <span className="text-gray-700">{followUp.message}</span>
               </li>
             ))}
           </ul>
