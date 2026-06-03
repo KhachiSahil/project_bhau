@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const data = await prisma.enquiry.findUnique({
     where:
       { id: enquiryId },
+      relationLoadStrategy: 'join',
     include: {
       Customer: true,
       destination: true,
@@ -65,42 +66,46 @@ export async function POST(req: NextRequest) {
       websiteId,
     } = data;
 
-    const oldEnquiry = await prisma.enquiry.findUnique({
-      where: {
-        id: id
-      }
-    })
-
-    /* ------------------------------------------------- *
-     * Basic validation
-     * ------------------------------------------------- */
     if (!Customer || !pickupDate || !dropDate) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    /* ------------------------------------------------- *
-     * Upsert Customer
-     * ------------------------------------------------- */
-    const customerRow = await prisma.customer.upsert({
-      where: Customer.id ? { id: Customer.id } : { email: Customer.email },
-      update: {
-        name: Customer.name,
-        phone: Customer.phone,
-      },
-      create: {
-        id: Customer.id,
-        email: Customer.email,
-        name: Customer.name,
-        phone: Customer.phone,
-      },
-    });
+    /* -----------------------------------------
+       old enquiry + customer in parallel
+    ----------------------------------------- */
 
-    /* ------------------------------------------------- *
-     * Upsert / create Enquiry and static look‑ups
-     * ------------------------------------------------- */
+    const [oldEnquiry, customerRow] = await Promise.all([
+      prisma.enquiry.findUnique({
+        where: { id },
+        select: {
+          status: true,
+        },
+      }),
+
+      prisma.customer.upsert({
+        where: Customer.id
+          ? { id: Customer.id }
+          : { email: Customer.email },
+        update: {
+          name: Customer.name,
+          phone: Customer.phone,
+        },
+        create: {
+          id: Customer.id,
+          email: Customer.email,
+          name: Customer.name,
+          phone: Customer.phone,
+        },
+      }),
+    ]);
+
+    /* -----------------------------------------
+       destinations in parallel
+    ----------------------------------------- */
+
     const upsertDest = (name: string) =>
       prisma.destination.upsert({
         where: { name },
@@ -114,8 +119,12 @@ export async function POST(req: NextRequest) {
       upsertDest(dropLocation.name),
     ]);
 
+    /* -----------------------------------------
+       enquiry
+    ----------------------------------------- */
+
     const enquiryRow = await prisma.enquiry.upsert({
-      where: id ? { id } : { id: "-placeholder-" }, // `-placeholder-` never exists
+      where: id ? { id } : { id: "-placeholder-" },
       update: {
         customerId: customerRow.id,
         adults,
@@ -147,98 +156,145 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    /* ------------------------------------------------- *
-     * CabBooking ‑ replace‑all
-     * ------------------------------------------------- */
-    if (cabBookings.length) {
-      const cabSrc = cabBookings[0];                   // (UI allows one owner)
-      const cabRow = await prisma.cabBooking.upsert({
-        where: cabSrc.id ? { id: cabSrc.id } : { id: "-placeholder-" },
-        update: {
-          pickupDate: new Date(cabSrc.pickupDate),
-          dropDate: new Date(cabSrc.dropDate),
-          enquiryId: enquiryRow.id,
-          cabOwnerId: cabSrc.CabOwner.id,
+    /* -----------------------------------------
+       cab workflow
+    ----------------------------------------- */
+
+    const cabTask =
+      cabBookings.length > 0
+        ? (async () => {
+            const cabSrc = cabBookings[0];
+
+            const cabRow = await prisma.cabBooking.upsert({
+              where: cabSrc.id
+                ? { id: cabSrc.id }
+                : { id: "-placeholder-" },
+              update: {
+                pickupDate: new Date(cabSrc.pickupDate),
+                dropDate: new Date(cabSrc.dropDate),
+                enquiryId: enquiryRow.id,
+                cabOwnerId: cabSrc.CabOwner.id,
+              },
+              create: {
+                id: cabSrc.id,
+                pickupDate: new Date(cabSrc.pickupDate),
+                dropDate: new Date(cabSrc.dropDate),
+                enquiryId: enquiryRow.id,
+                cabOwnerId: cabSrc.CabOwner.id,
+              },
+            });
+
+            await prisma.bookedDate.deleteMany({
+              where: {
+                cabBookingId: cabRow.id,
+              },
+            });
+
+            if (cabSrc.CabOwner.bookedDates?.length) {
+              await prisma.bookedDate.createMany({
+                data: cabSrc.CabOwner.bookedDates.map((bd: any) => ({
+                  cabBookingId: cabRow.id,
+                  cabOwnerId: cabSrc.CabOwner.id,
+                  date: new Date(bd.date),
+                })),
+              });
+            }
+          })()
+        : Promise.resolve();
+
+    /* -----------------------------------------
+       hotel workflow
+    ----------------------------------------- */
+
+    const hotelTask = (async () => {
+      await prisma.hotelBookingDate.deleteMany({
+        where: {
+          hotel: {
+            enquiryId: enquiryRow.id,
+          },
         },
-        create: {
-          id: cabSrc.id,
-          pickupDate: new Date(cabSrc.pickupDate),
-          dropDate: new Date(cabSrc.dropDate),
+      });
+
+      await prisma.hotel.deleteMany({
+        where: {
           enquiryId: enquiryRow.id,
-          cabOwnerId: cabSrc.CabOwner.id,
         },
       });
 
-      // replace booked‑dates
-      await prisma.bookedDate.deleteMany({ where: { cabBookingId: cabRow.id } });
-      if (cabSrc.CabOwner.bookedDates?.length) {
-        await prisma.bookedDate.createMany({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: cabSrc.CabOwner.bookedDates.map((bd: any) => ({
-            cabBookingId: cabRow.id,
-            cabOwnerId: cabSrc.CabOwner.id,
-            date: new Date(bd.date),
-          })),
-        });
-      }
+      await Promise.all(
+        hotels.map(async (h: any) => {
+          const hotelRow = await prisma.hotel.create({
+            data: {
+              enquiryId: enquiryRow.id,
+              name: h.name ?? "",
+            },
+          });
+
+          if (h.bookingDates?.length) {
+            await prisma.hotelBookingDate.createMany({
+              data: h.bookingDates.map((bd: any) => ({
+                hotelId: hotelRow.id,
+                date: new Date(bd.date),
+              })),
+            });
+          }
+        })
+      );
+    })();
+
+    /* -----------------------------------------
+       followups workflow
+    ----------------------------------------- */
+
+    const followUpTask =
+      followUps.length > 0
+        ? prisma.followUp.createMany({
+            data: followUps.map((f: any) => ({
+              enquiryId: enquiryRow.id,
+              date: new Date(f.date),
+              message: f.message ?? "",
+              employeeId,
+            })),
+          })
+        : Promise.resolve();
+
+    /* -----------------------------------------
+       run independent workflows together
+    ----------------------------------------- */
+
+    await Promise.all([
+      cabTask,
+      hotelTask,
+      followUpTask,
+    ]);
+
+    /* -----------------------------------------
+       email after successful DB operations
+    ----------------------------------------- */
+
+    if (
+      status === "Completed" &&
+      oldEnquiry?.status !== "Completed"
+    ) {
+      await sendCompletionEmail(
+        customerRow.email,
+        enquiryRow
+      );
     }
-
-    /* ------------------------------------------------- *
-     *  Hotel blocks ‑ replace‑all
-     * ------------------------------------------------- */
-    // ❶ delete children first (FK safe)
-    await prisma.hotelBookingDate.deleteMany({
-      where: { hotel: { enquiryId: enquiryRow.id } },
-    });
-    // ❷ delete parent hotels
-    await prisma.hotel.deleteMany({ where: { enquiryId: enquiryRow.id } });
-
-    // recreate
-    for (const h of hotels) {
-      const hotelRow = await prisma.hotel.create({
-        data: { enquiryId: enquiryRow.id, name: h.name ?? "" },
-      });
-
-      if (h.bookingDates?.length) {
-        await prisma.hotelBookingDate.createMany({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: h.bookingDates.map((bd: any) => ({
-            hotelId: hotelRow.id,
-            date: new Date(bd.date),
-          })),
-        });
-      }
-    }
-
-    /* ------------------------------------------------- *
-     * Follow‑ups ‑ replace‑all
-     * ------------------------------------------------- */
-    // await prisma.followUp.deleteMany({ where: { enquiryId: enquiryRow.id } });
-
-    if (followUps.length) {
-      await prisma.followUp.createMany({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: followUps.map((f: any) => ({
-          enquiryId: enquiryRow.id,
-          date: new Date(f.date),
-          message: f.message ?? "",
-          employeeId
-        })),
-      });
-    }
-
-
-
-    if (status === "Completed" && oldEnquiry?.status !== "Completed")
-      await sendCompletionEmail(customerRow.email, enquiryRow)
-
 
     return NextResponse.json(
-      { message: "Enquiry saved / updated", enquiryId: enquiryRow.id },
-      { status: 200 },
+      {
+        message: "Enquiry saved / updated",
+        enquiryId: enquiryRow.id,
+      },
+      { status: 200 }
     );
   } catch (err) {
     console.error("POST /api/common/Enquiries error:", err);
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

@@ -2,43 +2,66 @@ import prisma from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const adminId = searchParams.get("adminId");
+  try {
+    const { searchParams } = new URL(req.url);
 
-  if (!adminId)
-    return NextResponse.json({ msg: "admin not found" }, { status: 401 });
+    const adminId = searchParams.get("adminId");
+    const page = Number(searchParams.get("page") || 1);
+    const limit = Number(searchParams.get("limit") || 10);
 
-  const found = await prisma.admin.findUnique({
-    where: { id: adminId },
-  });
-
-  if (!found)
-    return NextResponse.json({ msg: "admin not found" }, { status: 401 });
-
-  const enquiries = await prisma.enquiry.findMany({
-    include: {
-      Customer: true,
-      destination: true,
-      pickupLocation: true,
-      dropLocation: true,
-      followUps: true,
-      website: true,
-      hotels: {
-        include: {
-          bookingDates: true
-        }
-      },
-      cabBookings: {
-        include: {
-          CabOwner: {
-            include: {
-              bookedDates: true
-            }
-          }
-        }
-      }
+    if (!adminId) {
+      return NextResponse.json(
+        { msg: "admin not found" },
+        { status: 401 }
+      );
     }
-  });
-  console.log(enquiries[0].destination)
-  return NextResponse.json({ status: 200,enquiries});
+
+    const found = await prisma.admin.findUnique({
+      where: { id: adminId },
+      select: { id: true }
+    });
+
+    if (!found) {
+      return NextResponse.json(
+        { msg: "admin not found" },
+        { status: 401 }
+      );
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [enquiries, totalCount] = await Promise.all([
+      prisma.enquiry.findMany({
+        skip,
+        take: limit,
+        include: {
+          Customer: true,
+          destination: true,
+          pickupLocation: true,
+          dropLocation: true,
+          followUps: true,
+          website: true,
+        },
+
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+
+      prisma.enquiry.count(),
+    ]);
+    return NextResponse.json({
+      enquiries,
+      page,
+      totalCount,
+      hasNextPage: page * limit < totalCount,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { msg: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }

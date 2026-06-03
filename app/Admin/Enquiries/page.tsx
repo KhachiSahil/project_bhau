@@ -5,7 +5,7 @@ import { Filter, Eye } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useMemo, useRef } from "react";
 
-type StatusType = "Pending"  | "Completed" | "Cancelled";
+type StatusType = "Pending" | "Completed" | "Cancelled";
 
 const statusColors: Record<StatusType, string> = {
   Pending: "bg-gray-100 text-gray-700",
@@ -47,15 +47,14 @@ export default function Enquiries() {
         );
         const data = await res.json();
         const newEnquiries = data.enquiries || [];
-        console.log(data)
+        setHasNextPage(data.hasNextPage);
         setEnquiries(prev => {
           // For page 1, replace all data
           if (page === 1) return newEnquiries;
           // For subsequent pages, append new data
           return [...prev, ...newEnquiries];
         });
-        
-        setHasNextPage(data.hasNextPage);
+
         initialFetchDone.current = true;
       } catch (error) {
         console.error("Error fetching enquiries:", error);
@@ -88,7 +87,6 @@ export default function Enquiries() {
       return matchStatus && matchSearch;
     });
   }, [enquiries, selectedTab, searchQuery]);
-
   return (
     <div className="bg-white shadow-md rounded-lg p-0 md:p-6 w-full">
       {isModal && <ModalEnquiries enquiryId={enqNumber} onClose={() => setIsModal(false)} />}
@@ -176,11 +174,11 @@ export default function Enquiries() {
                     </td>
                     <td className="py-4 md:py-2 px-4 h-full align-middle">
                       <div className="flex justify-center gap-3 h-full">
-                        <button 
+                        <button
                           onClick={() => {
                             setIsModal(true);
                             setEnqNumber(enquiry.id);
-                          }} 
+                          }}
                           className="hover:text-gray-600"
                         >
                           <Eye size={20} />

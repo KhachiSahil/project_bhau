@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
 
         // 5. Create CabBooking if any cab days selected
         const cabDates: string[] = Object.entries(selection)
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, value]) => (value as { cab?: boolean }).cab)
             .map(([date]) => date);
 
@@ -198,19 +198,18 @@ export async function GET(req: NextRequest) {
                 }
             })
         ])
-        const totalPages = Math.ceil(totalCount / limit);
-        console.log(enquiries,totalPages)
-        
+
         console.log("Fired backend api...")
         return NextResponse.json({
             // data: enquiries, page, totalPages, totalCount,,
             enquiries,
-            hasPrevPage: 0 > 1,
-            hasNextPage: 2 < 3
+            page,
+            totalCount,
+            hasNextPage: page * limit < totalCount,
         }, { status: 200 });
 
     } catch (error) {
         console.error("[GET_ENQUIRIES_ERROR]", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-    }   
+    }
 }
