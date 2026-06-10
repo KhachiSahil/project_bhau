@@ -77,7 +77,7 @@ export default function Enquiries() {
       setPage(1);
     };
   }, [status]);
-  console.log(enquiries)
+  // console.log(enquiries)
   // Filtered Enquiries Based on Tab & Search
   const filteredEnquiries = useMemo(() => {
     return enquiries.filter((enquiry) => {

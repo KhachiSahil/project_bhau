@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FollowUp from "./FollowUpProps";
 import { dataModalProps, ModalProps } from "@/app/lib/utils/types";
 
 export default function Modal({ enquiryId, onClose }: ModalProps) {
   const [data, setData] = useState<dataModalProps>();
+  const [originalData, setOriginalData] = useState<dataModalProps>();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [followUps, setFollowUps] = useState<Array<{ id: string; date: string; message: string }>>([])
 
-  // Example hotel options
   const hotels = ["N/A", "Oberoi", "Taj", "Cecil"];
   const destinations = ["Bali, Indonesia", "Maldives", "Thailand", "Paris, France"];
   const airports = ["New Delhi Airport", "Mumbai Airport", "Dubai Airport", "Bali International Airport"];
   const status = ["Pending", "Completed", "Cancelled"];
-  // Fetch data on mount
+
+  // Prevents the date-range useEffect from firing on initial data load
+  const isDateRangeChange = useRef(false);
+
+  /* ── fetch on mount ── */
   useEffect(() => {
     async function fetchData() {
       if (!enquiryId) return;
@@ -23,8 +26,8 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/common/Enquiries?enqId=${enquiryId}`
         );
         const EnquiryData = await response.json();
-        console.log(EnquiryData?.data);
         setData(EnquiryData?.data);
+        setOriginalData(EnquiryData?.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -34,17 +37,19 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
     fetchData();
   }, [enquiryId]);
 
-  // Primitive field changes (string, number, status, requirements, etc)
+  /* ── primitive field change ── */
   const handlePrimitiveChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     field: keyof dataModalProps
   ) => {
+    if (field === "pickupDate" || field === "dropDate") {
+      isDateRangeChange.current = true;
+    }
     const { value } = e.target;
-    console.log(field, value);
     setData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
-  // Nested section field changes like Customer email, destination name, etc
+  /* ── nested section field change ── */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     section: keyof dataModalProps,
@@ -52,213 +57,167 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
   ) => {
     setData((prev) => {
       if (!prev) return prev;
-
       const sectionData = prev[section];
-      if (typeof sectionData !== "object" || sectionData === null || Array.isArray(sectionData)) {
+      if (
+        typeof sectionData !== "object" ||
+        sectionData === null ||
+        Array.isArray(sectionData)
+      ) {
         console.warn(`Cannot update section ${section} - not an object`);
         return prev;
       }
-
       return {
         ...prev,
-        [section]: {
-          ...sectionData,
-          [field]: e.target.value,
-        },
+        [section]: { ...sectionData, [field]: e.target.value },
       };
     });
   };
 
-  // Generate date strings between pickupDate and dropDate
+  /* ── generate date range ── */
   const generateDates = (): string[] => {
-    if (!data) return [];
+    if (!data?.pickupDate || !data?.dropDate) return [];
     const start = new Date(data.pickupDate.split("T")[0]);
     const end = new Date(data.dropDate.split("T")[0]);
-
-    const dates = [];
+    const dates: string[] = [];
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      dates.push(d.toISOString().split("T")[0]);
+      dates.push(new Date(d).toISOString().split("T")[0]);
     }
     return dates;
   };
 
+  /* ── filter bookings when date range changes ── */
   useEffect(() => {
-    if (!data?.pickupDate || !data?.dropDate || !data.hotels) return;
+    if (!isDateRangeChange.current) return;
+    isDateRangeChange.current = false;
+
+    if (!data?.pickupDate || !data?.dropDate) return;
 
     const startDate = data.pickupDate.split("T")[0];
     const endDate = data.dropDate.split("T")[0];
 
-    const updatedHotels = data.hotels
-      .map(hotel => {
-        const filteredBookingDates = hotel.bookingDates.filter(bd => {
-          const dateOnly = bd.date.split("T")[0];
-          return dateOnly >= startDate && dateOnly <= endDate;
-        });
-
-        return {
-          ...hotel,
-          bookingDates: filteredBookingDates,
-        };
-      })
-      .filter(hotel => hotel.bookingDates.length > 0); // Remove hotels with no dates
-
-    setData(prev => {
+    setData((prev) => {
       if (!prev) return prev;
-      return {
-        ...prev,
-        hotels: updatedHotels,
-      };
-    });
-  }, [data?.pickupDate, data?.dropDate, data?.hotels]);
 
+      const updatedHotels = (prev.hotels ?? [])
+        .map((hotel) => ({
+          ...hotel,
+          bookingDates: hotel.bookingDates.filter((bd) => {
+            const d = bd.date.split("T")[0];
+            return d >= startDate && d <= endDate;
+          }),
+        }))
+        .filter((hotel) => hotel.bookingDates.length > 0);
 
-  //to maintain data between bounds
-  useEffect(() => {
-    const newDates = data?.cabBookings?.[0];
-    if (newDates) {
-      const cabBooking = newDates;
-      const newBookedDates = cabBooking.CabOwner.bookedDates.filter((bd) => {
-        return bd.date.split("T")[0] >= data.pickupDate.split("T")[0] &&
-          bd.date.split("T")[0] <= data.dropDate.split("T")[0]
-      });
-      setData((prev) => {
-        if (!prev) return prev;
-
-        const updatedCabBookings = [...(prev.cabBookings || [])];
-        updatedCabBookings[0] = {
-          ...cabBooking,
-          CabOwner: {
-            ...cabBooking.CabOwner,
-            bookedDates: newBookedDates,
-          },
+      // bookedDates now lives on CabBooking directly (not CabOwner)
+      const updatedCabBookings = (prev.cabBookings ?? []).map((cb, idx) => {
+        if (idx !== 0) return cb;
+        return {
+          ...cb,
+          bookedDates: cb.bookedDates.filter((bd) => {
+            const d = bd.date.split("T")[0];
+            return d >= startDate && d <= endDate;
+          }),
         };
-
-        return { ...prev, cabBookings: updatedCabBookings };
       });
-    }
 
-  }, [data?.pickupDate, data?.dropDate, data?.cabBookings]);
+      return { ...prev, hotels: updatedHotels, cabBookings: updatedCabBookings };
+    });
+  }, [data?.pickupDate, data?.dropDate]);
 
-  // Toggle cab or hotel booking on a date
+  /* ── toggle cab / hotel booking on a date ── */
   const handleToggleBooking = (date: string, type: "cab" | "hotel") => {
-    if (!data || !isEditing) return;
+    if (!data || !isEditing || !date) return;
 
     if (type === "cab") {
       const cabBooking = data.cabBookings?.[0];
       if (!cabBooking) return;
-      //find if date exists to delete that
-      const exists = cabBooking.CabOwner.bookedDates.find(
+
+      // bookedDates is on cabBooking directly now
+      const exists = cabBooking.bookedDates.find(
         (bd) => bd.date.split("T")[0] === date
       );
 
-      let newBookedDates = [...cabBooking.CabOwner.bookedDates];
-
-      if (exists) {
-        // Remove date
-        newBookedDates = newBookedDates.filter(
-          (bd) => bd.date.split("T")[0] !== date
-        );
-      } else {
-        // Add date with temp id
-        newBookedDates.push({
-          id: `temp-${Date.now()}`,
-          cabBookingId: cabBooking.id,
-          cabOwnerId: cabBooking.CabOwner.id,
-          date: `${date}T00:00:00.000Z`,
-        });
-      }
+      const newBookedDates = exists
+        ? cabBooking.bookedDates.filter((bd) => bd.date.split("T")[0] !== date)
+        : [
+            ...cabBooking.bookedDates,
+            {
+              id: `temp-${Date.now()}`,
+              cabBookingId: cabBooking.id,
+              date: `${date}T00:00:00.000Z`,
+            },
+          ];
 
       setData((prev) => {
         if (!prev) return prev;
-
-        const updatedCabBookings = [...(prev.cabBookings || [])];
+        const updatedCabBookings = [...(prev.cabBookings ?? [])];
         updatedCabBookings[0] = {
           ...cabBooking,
-          CabOwner: {
-            ...cabBooking.CabOwner,
-            bookedDates: newBookedDates,
-          },
+          bookedDates: newBookedDates,
         };
-
         return { ...prev, cabBookings: updatedCabBookings };
       });
     }
 
     if (type === "hotel") {
-      if (!date) return;
-
+      const updatedHotels = [...data.hotels];
+      let bookingToMove = null;
       let underWhichHotel = null;
-      let dateFound = null;
 
-      // Step 1: Find which hotel has the date
-      for (const hotel of data.hotels) {
+      for (const hotel of updatedHotels) {
         const match = hotel.bookingDates.find(
-          (booking) => booking.date.split("T")[0] === date.split("T")[0]
+          (bd) => bd.date.split("T")[0] === date
         );
         if (match) {
           underWhichHotel = hotel;
-          dateFound = match;
+          bookingToMove = match;
           break;
         }
       }
 
-      const updatedHotels = [...data.hotels];
-
-      if (dateFound && underWhichHotel) {
-        // Step 2: Remove the booking
+      if (bookingToMove && underWhichHotel) {
         const updatedBookingDates = underWhichHotel.bookingDates.filter(
-          (bd) => bd.date.split("T")[0] !== date.split("T")[0]
+          (bd) => bd.date.split("T")[0] !== date
         );
-
         if (updatedBookingDates.length === 0) {
-          // Step 3: Remove the whole hotel entry if no bookings left
-          const remainingHotels = updatedHotels.filter(
-            (h) => h.id !== underWhichHotel.id
+          setData((prev) =>
+            prev
+              ? { ...prev, hotels: updatedHotels.filter((h) => h.id !== underWhichHotel!.id) }
+              : prev
           );
-          setData((prev) => prev ? { ...prev, hotels: remainingHotels } : prev);
         } else {
-          // Step 4: Update that hotel's bookingDates
-          const hotelIndex = updatedHotels.findIndex(
-            (h) => h.id === underWhichHotel.id
-          );
+          const hotelIndex = updatedHotels.findIndex((h) => h.id === underWhichHotel!.id);
           updatedHotels[hotelIndex] = {
             ...underWhichHotel,
             bookingDates: updatedBookingDates,
           };
-          setData((prev) => prev ? { ...prev, hotels: updatedHotels } : prev);
+          setData((prev) => (prev ? { ...prev, hotels: updatedHotels } : prev));
         }
       } else {
-        // Step 5: Add new booking to first hotel (or create a new one)
         const newBooking = {
           id: `temp-booking-${Date.now()}`,
           date: `${date}T00:00:00.000Z`,
-          name: "", // No prefilled hotel name as requested
+          name: "",
         };
-
         if (updatedHotels.length === 0) {
-          // No hotel exists, create new hotel entry
           updatedHotels.push({
             id: `temp-hotel-${Date.now()}`,
             name: "",
             bookingDates: [newBooking],
           });
         } else {
-          // Add new booking to first existing hotel
           updatedHotels[0].bookingDates.push(newBooking);
         }
-
-        setData((prev) => prev ? { ...prev, hotels: updatedHotels } : prev);
+        setData((prev) => (prev ? { ...prev, hotels: updatedHotels } : prev));
       }
     }
   };
 
-  // Change hotel name for a booking date
+  /* ── hotel name change ── */
   const handleHotelNameChange = (date: string, newName: string) => {
     if (!data || !isEditing || !newName || !date) return;
 
     const updatedHotels = [...data.hotels];
-
-    // Step 1: Find the hotel and booking that currently holds the date
     let bookingToMove = null;
 
     for (let i = 0; i < updatedHotels.length; i++) {
@@ -267,10 +226,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       );
       if (index !== -1) {
         bookingToMove = updatedHotels[i].bookingDates[index];
-        // Step 2: Remove the booking from this hotel
         updatedHotels[i].bookingDates.splice(index, 1);
-
-        // If hotel now has 0 bookings, remove the whole hotel
         if (updatedHotels[i].bookingDates.length === 0) {
           updatedHotels.splice(i, 1);
         }
@@ -278,15 +234,13 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       }
     }
 
-    // Step 3: Add this booking to the target hotel (by name)
-    const toHotel = updatedHotels.find((h) => h.name === newName);
-
     const newBooking = {
       id: bookingToMove?.id || `temp-${Date.now()}`,
       date: `${date}T00:00:00.000Z`,
       name: newName,
     };
 
+    const toHotel = updatedHotels.find((h) => h.name === newName);
     if (toHotel) {
       toHotel.bookingDates.push(newBooking);
     } else {
@@ -297,12 +251,10 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       });
     }
 
-    // Step 4: Update state
-    setData((prev) => prev ? { ...prev, hotels: updatedHotels } : prev);
+    setData((prev) => (prev ? { ...prev, hotels: updatedHotels } : prev));
   };
 
-
-  // Quotation handlers
+  /* ── quotation handlers ── */
   const handleQuotationChange = (index: number, value: string) => {
     if (!data) return;
     const updated = [...data.quotation];
@@ -311,82 +263,75 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
   };
 
   const addQuotation = () => {
-    if (!data) return;
-    setData((prev) => (prev ? { ...prev, quotation: [...prev.quotation, ""] } : prev));
+    setData((prev) =>
+      prev ? { ...prev, quotation: [...prev.quotation, ""] } : prev
+    );
   };
 
   const removeQuotation = (index: number) => {
-    if (!data) return;
     setData((prev) =>
       prev
-        ? {
-          ...prev,
-          quotation: prev.quotation.filter((_, i) => i !== index),
-        }
+        ? { ...prev, quotation: prev.quotation.filter((_, i) => i !== index) }
         : prev
     );
   };
-  //Handle the follow up part 
+
+  /* ── follow-up handler ── */
   function handleFollowUps(date: string, note: string) {
     const newFollowUp = {
-      id: `${Date.now()}`, // Use timestamp as ID
+      id: `temp-${Date.now()}`,
       date,
-      message : note,
+      message: note,
     };
-    
     setData((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        followUps: [newFollowUp, ...(prev.followUps || [])], // prepend new follow-up
+        followUps: [newFollowUp, ...(prev.followUps || [])],
       };
     });
-    setFollowUps(prev => [newFollowUp, ...prev]);
   }
 
-  // Edit mode handlers
+  /* ── edit mode handlers ── */
   const handleEditClick = () => setIsEditing(true);
-  const handleCancelClick = () => setIsEditing(false);
+
+  const handleCancelClick = () => {
+    setData(originalData); // restore unsaved changes
+    setIsEditing(false);
+  };
+
   const handleSaveClick = async () => {
     if (!data) return;
-
-    console.log("Saving data:", data);
-    setIsLoading(true); // optional: add loading feedback
-
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/common/Enquiries`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ data,followUps }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data }),
         }
       );
-
       const result = await response.json();
-
       if (!response.ok) {
         console.error("Failed to save data:", result?.message || result);
         alert("Failed to save enquiry data.");
       } else {
-        console.log(" Data saved successfully:", result);
+        setOriginalData(data); // update baseline after successful save
       }
     } catch (err) {
       console.error("Error saving data:", err);
-      alert(" Something went wrong while saving.");
+      alert("Something went wrong while saving.");
     } finally {
       setIsEditing(false);
       setIsLoading(false);
     }
   };
 
-
+  /* ── render ── */
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/80 transition backdrop-blur-md p-4">
       <div className="relative bg-white rounded-sm shadow-lg w-full md:w-[80vw] lg:w-[80vw] xl:w-[80vw] max-h-[80vh]">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl"
@@ -394,26 +339,27 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
           ✖
         </button>
 
-        {/* Content */}
         {isLoading ? (
           <div className="overflow-y-auto max-h-[80vh] p-6">Loading...</div>
         ) : (
           <div className="overflow-y-auto max-h-[80vh] p-6">
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">Booking Details</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
+              Booking Details
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left Side */}
+              {/* ── Left Side ── */}
               <div className="space-y-4">
+
                 {/* Customer Info */}
                 <div className="bg-white p-4 flex gap-5 rounded-sm shadow border border-gray-400">
-                  <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
+                  <div className="w-10 h-10 bg-gray-600 rounded-full" />
                   <div>
                     <h3 className="text-xl font-bold text-gray-800">Customer Information</h3>
                     <p className="text-gray-600 text-lg font-semibold">{data?.Customer?.name}</p>
                     {isEditing ? (
                       <input
                         type="email"
-                        name="email"
                         value={data?.Customer?.email || ""}
                         onChange={(e) => handleChange(e, "Customer", "email")}
                         className="text-gray-600 border border-gray-600 p-1 rounded-md text-lg font-semibold"
@@ -421,7 +367,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                     ) : (
                       <p className="text-gray-600 text-lg font-semibold">{data?.Customer?.email}</p>
                     )}
-                    <p className="text-gray-500 font-bold">📞 {data?.Customer.phone}</p>
+                    <p className="text-gray-500 font-bold">📞 {data?.Customer?.phone}</p>
                   </div>
                 </div>
 
@@ -459,15 +405,12 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       <strong className="text-lg underline">Destination:</strong>{" "}
                       {isEditing ? (
                         <select
-                          name="destination"
-                          value={data?.destination.name || ""}
+                          value={data?.destination?.name || ""}
                           onChange={(e) => handleChange(e, "destination", "name")}
                           className="w-full border p-2 rounded-md"
                         >
                           {destinations.map((dest) => (
-                            <option key={dest} value={dest}>
-                              {dest}
-                            </option>
+                            <option key={dest} value={dest}>{dest}</option>
                           ))}
                         </select>
                       ) : (
@@ -478,38 +421,32 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       <strong className="text-lg underline">Pickup:</strong>{" "}
                       {isEditing ? (
                         <select
-                          name="pickup"
-                          value={data?.pickupLocation.name || ""}
+                          value={data?.pickupLocation?.name || ""}
                           onChange={(e) => handleChange(e, "pickupLocation", "name")}
                           className="w-full border p-2 rounded-md"
                         >
                           {airports.map((airport) => (
-                            <option key={airport} value={airport}>
-                              {airport}
-                            </option>
+                            <option key={airport} value={airport}>{airport}</option>
                           ))}
                         </select>
                       ) : (
-                        data?.pickupLocation.name
+                        data?.pickupLocation?.name
                       )}
                     </p>
                     <p>
                       <strong className="text-lg underline">Drop:</strong>{" "}
                       {isEditing ? (
                         <select
-                          name="drop"
-                          value={data?.dropLocation.name || ""}
+                          value={data?.dropLocation?.name || ""}
                           onChange={(e) => handleChange(e, "dropLocation", "name")}
                           className="w-full border p-2 rounded-md"
                         >
                           {airports.map((airport) => (
-                            <option key={airport} value={airport}>
-                              {airport}
-                            </option>
+                            <option key={airport} value={airport}>{airport}</option>
                           ))}
                         </select>
                       ) : (
-                        data?.dropLocation.name
+                        data?.dropLocation?.name
                       )}
                     </p>
                     <p>
@@ -517,16 +454,12 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       {isEditing ? (
                         <input
                           type="date"
-                          name="arrivalDate"
-                          value={data?.pickupDate.split("T")[0] || ""}
-                          onChange={(e) => {
-                            handlePrimitiveChange(e, "pickupDate");
-                            handleToggleBooking("", "cab")
-                          }}
+                          value={data?.pickupDate?.split("T")[0] || ""}
+                          onChange={(e) => handlePrimitiveChange(e, "pickupDate")}
                           className="w-full border p-2 rounded-md"
                         />
                       ) : (
-                        data?.pickupDate.split("T")[0]
+                        data?.pickupDate?.split("T")[0]
                       )}
                     </p>
                     <p>
@@ -534,48 +467,38 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       {isEditing ? (
                         <input
                           type="date"
-                          name="EndDate"
-                          value={data?.dropDate.split("T")[0] || ""}
-                          onChange={(e) => {
-                            handlePrimitiveChange(e, "dropDate");
-                            handleToggleBooking("", "cab")
-                          }}
+                          value={data?.dropDate?.split("T")[0] || ""}
+                          onChange={(e) => handlePrimitiveChange(e, "dropDate")}
                           className="w-full border p-2 rounded-md"
                         />
                       ) : (
-                        data?.dropDate.split("T")[0]
+                        data?.dropDate?.split("T")[0]
                       )}
                     </p>
                     <div>
-                      <div>
-                        <p>
-                          <strong className="text-lg underline">Status:</strong>{" "}
-                          {isEditing ? (
-                            <select
-                              name="status"
-                              value={data?.status || ""}
-                              onChange={(e) => handlePrimitiveChange(e, "status")}
-                              className="w-full border p-2 rounded-md"
-                            >
-                              {status.map((st) => (
-                                <option key={st} value={st}>
-                                  {st}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            data?.status
-                          )}
-                        </p>
-                      </div>
+                      <p>
+                        <strong className="text-lg underline">Status:</strong>{" "}
+                        {isEditing ? (
+                          <select
+                            value={data?.status || ""}
+                            onChange={(e) => handlePrimitiveChange(e, "status")}
+                            className="w-full border p-2 rounded-md"
+                          >
+                            {status.map((st) => (
+                              <option key={st} value={st}>{st}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          data?.status
+                        )}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Cab & Hotel Booking Selection */}
+                {/* Cab & Hotel Booking Table */}
                 <div className="mb-6 bg-white p-4 rounded-sm shadow border border-gray-400">
                   <h3 className="text-xl font-bold mb-2">Cab / Hotel Booking Dates</h3>
-
                   <table className="w-full border-collapse border border-gray-300">
                     <thead>
                       <tr className="bg-gray-200">
@@ -588,19 +511,16 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                     <tbody>
                       {generateDates().map((date) => {
                         const cabBooked = data?.cabBookings?.some((cb) =>
-                          cb.CabOwner.bookedDates.some(
-                            (bd) => bd.date.split("T")[0] === date
-                          )
+                          cb.bookedDates.some((bd : any) => bd.date.split("T")[0] === date)
                         );
 
-                        const hotelBooking = data?.hotels.find((hotel) =>
+                        const hotelBooking = data?.hotels?.find((hotel) =>
                           hotel.bookingDates.some((bd) => bd.date.split("T")[0] === date)
                         );
 
                         return (
                           <tr key={date} className="text-center">
                             <td className="border border-gray-300 p-2">{date}</td>
-
                             <td className="border border-gray-300 p-2">
                               <input
                                 type="checkbox"
@@ -610,7 +530,6 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                                 className="w-5 h-5"
                               />
                             </td>
-
                             <td className="border border-gray-300 p-2">
                               <input
                                 type="checkbox"
@@ -620,22 +539,17 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                                 className="w-5 h-5"
                               />
                             </td>
-
                             <td className="border border-gray-300 p-2">
                               {isEditing ? (
                                 <select
                                   disabled={!hotelBooking}
                                   value={hotelBooking?.name || ""}
-                                  onChange={(e) =>
-                                    handleHotelNameChange(date, e.target.value)
-                                  }
+                                  onChange={(e) => handleHotelNameChange(date, e.target.value)}
                                   className="w-full border p-1 rounded"
                                 >
                                   <option value="">Select hotel</option>
                                   {hotels.map((hotel) => (
-                                    <option key={hotel} value={hotel}>
-                                      {hotel}
-                                    </option>
+                                    <option key={hotel} value={hotel}>{hotel}</option>
                                   ))}
                                 </select>
                               ) : (
@@ -650,10 +564,10 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                 </div>
 
                 {/* Quotations */}
-                <div className="">
+                <div>
                   <strong className="text-lg underline">Quotations:</strong>
                   <div className="flex flex-col gap-2 mt-2">
-                    {data?.quotation.map((quote, index) => (
+                    {data?.quotation?.map((quote, index) => (
                       <div key={index} className="flex items-center gap-2">
                         {isEditing ? (
                           <>
@@ -672,7 +586,9 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                             </button>
                           </>
                         ) : (
-                          <span className="p-2 bg-gray-200 rounded-md text-gray-700 w-24">{quote}</span>
+                          <span className="p-2 bg-gray-200 rounded-md text-gray-700 w-24">
+                            {quote}
+                          </span>
                         )}
                       </div>
                     ))}
@@ -688,7 +604,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                 </div>
               </div>
 
-              {/* Right Side: FollowUps */}
+              {/* ── Right Side: FollowUps ── */}
               <div className="bg-white p-4 rounded-sm shadow border border-gray-400 max-h-[65vh] overflow-y-auto">
                 <FollowUp
                   FollowUpsData={data?.followUps || []}

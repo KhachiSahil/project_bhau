@@ -9,6 +9,8 @@ export interface dataModalProps {
   status: string;
   createdAt: string;
   quotation: string[];
+  employeeId: string;
+  websiteId: string;
 
   Customer: {
     id: string;
@@ -21,10 +23,12 @@ export interface dataModalProps {
     id: string;
     name: string;
   };
+
   pickupLocation: {
     id: string;
     name: string;
   };
+
   dropLocation: {
     id: string;
     name: string;
@@ -41,29 +45,33 @@ export interface dataModalProps {
     bookingDates: {
       id: string;
       date: string;
-      name: string;
+      name: string;  // UI-only field for hotel name on a date, not in DB
     }[];
   }[];
 
   cabBookings: {
     id: string;
+    pickupDate?: string;   // optional — falls back to enquiry dates in API
+    dropDate?: string;
     CabOwner: {
       id: string;
       name: string;
       phone: string;
-      bookedDates: {
-        id: string;
-        cabBookingId: string;
-        cabOwnerId: string;
-        date: string;
-      }[];
+      // no bookedDates here anymore
     };
+    bookedDates: {         // moved here from CabOwner
+      id: string;
+      cabBookingId: string;
+      date: string;
+      // no cabOwnerId — removed from schema
+    }[];
   }[];
 
   followUps: {
     id: string;
     date: string;
     message: string;
+    enquiryId?: string;    // used to detect new (temp) vs existing follow-ups
   }[];
 }
 export type ModalProps = {

@@ -36,7 +36,7 @@ export default function ViewItenary({onClose,formData}: ViewItenaryProps) {
                 const data = await response.json();
 
                 setItinerary(data.itinerary || []);
-                console.log(data)
+                // console.log(data)
             } catch (error) {
                 console.error(error);
             } finally {

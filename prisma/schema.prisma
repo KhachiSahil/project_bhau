@@ -74,7 +74,7 @@ model Enquiry {
   Customer    Customer     @relation(fields: [customerId], references: [id])
   customerId  String       @db.Uuid
 
-  @@index([pickupDate, dropDate, employeeId,customerId,destinationId,websiteId,dropLocationId,pickupLocationId])
+  @@index([pickupDate, dropDate, employeeId, customerId, destinationId, websiteId, dropLocationId, pickupLocationId])
 }
 
 model Customer {
@@ -98,7 +98,7 @@ model FollowUp {
   enquiry   Enquiry @relation(fields: [enquiryId], references: [id])
   enquiryId String  @db.Uuid
 
-  @@index([date, employeeId,enquiryId])
+  @@index([date, employeeId, enquiryId])
 }
 
 model Hotel {
@@ -108,6 +108,7 @@ model Hotel {
   enquiryId String?  @db.Uuid
 
   bookingDates HotelBookingDate[]
+
   @@index([enquiryId])
 }
 
@@ -118,15 +119,14 @@ model HotelBookingDate {
   hotel   Hotel  @relation(fields: [hotelId], references: [id])
   hotelId String @db.Uuid
 
-  @@index([date,hotelId])
+  @@index([date, hotelId])
 }
 
 model CabOwner {
-  id          String       @id @default(uuid()) @db.Uuid
-  name        String       @unique
-  phone       String
-  bookings    CabBooking[]
-  bookedDates BookedDate[]
+  id       String       @id @default(uuid()) @db.Uuid
+  name     String       @unique
+  phone    String
+  bookings CabBooking[]
 
   @@index([name])
 }
@@ -142,6 +142,7 @@ model CabBooking {
   bookedDates BookedDate[]
   CabOwner    CabOwner     @relation(fields: [cabOwnerId], references: [id])
   cabOwnerId  String       @db.Uuid
+
   @@index([cabOwnerId, enquiryId])
 }
 
@@ -150,12 +151,9 @@ model BookedDate {
   cabBooking   CabBooking @relation(fields: [cabBookingId], references: [id])
   cabBookingId String     @db.Uuid
 
-  cabOwner   CabOwner @relation(fields: [cabOwnerId], references: [id])
-  cabOwnerId String   @db.Uuid
-
   date DateTime
 
-  @@index([cabOwnerId, date,cabBookingId])
+  @@index([cabBookingId, date])
 }
 
 model Itinerary {

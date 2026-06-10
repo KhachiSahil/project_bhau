@@ -39,7 +39,7 @@ function isUpcomingUTC(dateISO: string): boolean {
 export default function FollowUps({ followUps }: FollowUpsProps) {
   const [activeTab, setActiveTab] = useState<"All" | "Upcoming">("All");
   const [search, setSearch] = useState("");
-  console.log(followUps)
+  // console.log(followUps)
   /* ---------- pre‑process list once ------------- */
   const processed = useMemo(
     () =>
