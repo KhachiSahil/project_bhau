@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, Baby } from "lucide-react";
+import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, Baby, MapPinCheck } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 
@@ -17,7 +17,8 @@ export default function EmployeeSideBar() {
     { name: "Cab", path: "/Admin/Cab", icon: <CarTaxiFront size={20} /> },
     { name: "Follow Ups", path: "/Admin/FollowUps", icon: <CheckCircle size={20} /> },
     { name: "Reports", path: "/Admin/Reports", icon: <ChartLine size={20} /> },
-    { name: "Itenary", path: "/Admin/Itenary", icon: <Hammer size={20} /> }
+    { name: "Itinerary", path: "/Admin/Itenary", icon: <Hammer size={20} /> },
+    { name: "Destination", path: "/Admin/Destination", icon: <MapPinCheck size={20} /> }
   ];
 
   return (

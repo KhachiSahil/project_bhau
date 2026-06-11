@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import FollowUp from "./FollowUpProps";
 import { dataModalProps, ModalProps } from "@/app/lib/utils/types";
+import NotificationComponent from "@/components/NotificationComponent";
+import DestinationDropbox from "@/components/DestinationDropbox";
 
 export default function Modal({ enquiryId, onClose }: ModalProps) {
   const [data, setData] = useState<dataModalProps>();
   const [originalData, setOriginalData] = useState<dataModalProps>();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [selectedDestination, setSelectedDestination] = useState("");
   const hotels = ["N/A", "Oberoi", "Taj", "Cecil"];
-  const destinations = ["Bali, Indonesia", "Maldives", "Thailand", "Paris, France"];
   const airports = ["New Delhi Airport", "Mumbai Airport", "Dubai Airport", "Bali International Airport"];
   const status = ["Pending", "Completed", "Cancelled"];
 
@@ -51,7 +52,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
 
   /* ── nested section field change ── */
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    value: string,
     section: keyof dataModalProps,
     field: string
   ) => {
@@ -68,11 +69,10 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       }
       return {
         ...prev,
-        [section]: { ...sectionData, [field]: e.target.value },
+        [section]: { ...sectionData, [field]: value },
       };
     });
   };
-
   /* ── generate date range ── */
   const generateDates = (): string[] => {
     if (!data?.pickupDate || !data?.dropDate) return [];
@@ -140,13 +140,13 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
       const newBookedDates = exists
         ? cabBooking.bookedDates.filter((bd) => bd.date.split("T")[0] !== date)
         : [
-            ...cabBooking.bookedDates,
-            {
-              id: `temp-${Date.now()}`,
-              cabBookingId: cabBooking.id,
-              date: `${date}T00:00:00.000Z`,
-            },
-          ];
+          ...cabBooking.bookedDates,
+          {
+            id: `temp-${Date.now()}`,
+            cabBookingId: cabBooking.id,
+            date: `${date}T00:00:00.000Z`,
+          },
+        ];
 
       setData((prev) => {
         if (!prev) return prev;
@@ -361,7 +361,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       <input
                         type="email"
                         value={data?.Customer?.email || ""}
-                        onChange={(e) => handleChange(e, "Customer", "email")}
+                        onChange={(e) => handleChange(e.target.value, "Customer", "email")}
                         className="text-gray-600 border border-gray-600 p-1 rounded-md text-lg font-semibold"
                       />
                     ) : (
@@ -401,54 +401,30 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                         data?.kids
                       )}
                     </p>
-                    <p>
+                    <div>
                       <strong className="text-lg underline">Destination:</strong>{" "}
                       {isEditing ? (
-                        <select
-                          value={data?.destination?.name || ""}
-                          onChange={(e) => handleChange(e, "destination", "name")}
-                          className="w-full border p-2 rounded-md"
-                        >
-                          {destinations.map((dest) => (
-                            <option key={dest} value={dest}>{dest}</option>
-                          ))}
-                        </select>
+                        <DestinationDropbox value={data?.destination?.name || ""} onSelect={(value: string) => handleChange(value, "destination", "name")} />
                       ) : (
                         data?.destination?.name
                       )}
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       <strong className="text-lg underline">Pickup:</strong>{" "}
                       {isEditing ? (
-                        <select
-                          value={data?.pickupLocation?.name || ""}
-                          onChange={(e) => handleChange(e, "pickupLocation", "name")}
-                          className="w-full border p-2 rounded-md"
-                        >
-                          {airports.map((airport) => (
-                            <option key={airport} value={airport}>{airport}</option>
-                          ))}
-                        </select>
+                        <DestinationDropbox value={data?.pickupLocation?.name || ""} onSelect={(value: string) => handleChange(value, "pickupLocation", "name")} />
                       ) : (
                         data?.pickupLocation?.name
                       )}
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       <strong className="text-lg underline">Drop:</strong>{" "}
                       {isEditing ? (
-                        <select
-                          value={data?.dropLocation?.name || ""}
-                          onChange={(e) => handleChange(e, "dropLocation", "name")}
-                          className="w-full border p-2 rounded-md"
-                        >
-                          {airports.map((airport) => (
-                            <option key={airport} value={airport}>{airport}</option>
-                          ))}
-                        </select>
+                        <DestinationDropbox value={data?.dropLocation?.name || ""} onSelect={(value: string) => handleChange(value, "destination", "name")} />
                       ) : (
                         data?.dropLocation?.name
                       )}
-                    </p>
+                    </div>
                     <p>
                       <strong className="text-lg underline">Arrival Date:</strong>{" "}
                       {isEditing ? (
@@ -511,7 +487,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                     <tbody>
                       {generateDates().map((date) => {
                         const cabBooked = data?.cabBookings?.some((cb) =>
-                          cb.bookedDates.some((bd : any) => bd.date.split("T")[0] === date)
+                          cb.bookedDates.some((bd: any) => bd.date.split("T")[0] === date)
                         );
 
                         const hotelBooking = data?.hotels?.find((hotel) =>
@@ -643,6 +619,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
           </div>
         )}
       </div>
+      <NotificationComponent pickupLocation={data?.pickupLocation.name} destination={data?.destination.name} dropLocation={data?.dropLocation.name}/>
     </div>
   );
 }

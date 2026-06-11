@@ -1,6 +1,8 @@
 import { differenceInDays, format, addDays } from 'date-fns';
 import { useSession } from 'next-auth/react';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import {FormEvent, useState } from 'react';
+import DestinationDropbox from '../DestinationDropbox';
+
 type ButtonClick = {
     onClose: () => void;
 };
@@ -25,7 +27,7 @@ interface NewQueriesProps {
 }
 
 export default function NewQueries({ onClose }: ButtonClick) {
-    const { data: session} = useSession();
+    const { data: session } = useSession();
     const EmployeeId = session?.user.id
 
     const [selection, setSelection] = useState<{ [key: string]: { cab: boolean; hotel: boolean } }>({});
@@ -65,9 +67,8 @@ export default function NewQueries({ onClose }: ButtonClick) {
             phone: ""
         }
     })
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-
+    const handleChange = (value : string, name : string) => {
+        console.log(value)
         if (["name", "email", "phone"].includes(name)) {
             setData(prev => ({
                 ...prev,
@@ -94,7 +95,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
     const handleSubmit = async (e: FormEvent<HTMLButtonElement>) => {
         try {
             e.preventDefault();
-            await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Enquiry`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Enquiry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -105,10 +106,10 @@ export default function NewQueries({ onClose }: ButtonClick) {
                     hotelSelection,
                     selection
                 })
-            }
-            )
+            });
+            onClose();
         } catch (err) {
-            console.log(err)
+            alert(err);
         }
     }
 
@@ -141,7 +142,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         <div className="flex flex-col">
                             <label className="font-medium">Name</label>
                             <input
-                                onChange={handleChange}
+                                onChange={(e)=>handleChange(e.target.value,"name")}
                                 value={data.customer.name}
                                 name='name'
                                 type="text"
@@ -154,7 +155,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         <div className="flex flex-col">
                             <label className="font-medium">Email</label>
                             <input
-                                onChange={handleChange}
+                                onChange={(e)=>handleChange(e.target.value,"email")}
                                 value={data.customer.email}
                                 name='email'
                                 type="email" placeholder="xyz@gmail.com" className="input-field border border-gray-500 rounded-lg p-2" />
@@ -164,7 +165,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         <div className="flex flex-col">
                             <label className="font-medium">Phone No.</label>
                             <input
-                                onChange={handleChange}
+                                onChange={(e)=>handleChange(e.target.value,"phone")}
                                 value={data.customer.phone}
                                 name='phone'
                                 type="text" placeholder="+91 98765-43210" className="input-field border border-gray-500 rounded-lg p-2" />
@@ -179,11 +180,11 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         {/* Arrival Date */}
                         <div className="flex flex-col">
                             <label className="font-medium">Pickup Date</label>
-                            <input name='pickupDate' onChange={handleChange} value={data.pickupDate} type="date" className="input-field border border-gray-500 rounded-lg p-2" />
+                            <input name='pickupDate' onChange={(e)=>handleChange(e.target.value,"pickupDate")} value={data.pickupDate} type="date" className="input-field border border-gray-500 rounded-lg p-2" />
                         </div>
                         <div className="flex flex-col">
                             <label className="font-medium">Drop Date</label>
-                            <input name='dropDate' onChange={handleChange} value={data.dropDate} type="date" className="input-field border border-gray-500 rounded-lg p-2" />
+                            <input name='dropDate' onChange={(e)=>handleChange(e.target.value,"dropDate")} value={data.dropDate} type="date" className="input-field border border-gray-500 rounded-lg p-2" />
                         </div>
 
                         {/* No. of Persons */}
@@ -193,7 +194,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                                 <div className="flex flex-col">
                                     <label>Adults</label>
                                     <input
-                                        onChange={handleChange}
+                                        onChange={(e)=>handleChange(e.target.value,"adults")}
                                         value={data.adults}
                                         name='adults'
                                         type="number" min={1} className="input-field w-full sm:w-32 border border-gray-500 rounded-lg p-2" />
@@ -201,7 +202,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                                 <div className="flex flex-col">
                                     <label>Kids</label>
                                     <input
-                                        onChange={handleChange}
+                                        onChange={(e)=>handleChange(e.target.value,"kids")}
                                         value={data.kids}
                                         name='kids'
                                         type="number" min={0} className="input-field w-full sm:w-32 border border-gray-500 rounded-lg p-2" />
@@ -212,46 +213,19 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         {/* Travel Destination */}
                         <div className="flex flex-col">
                             <label className="font-medium">Travel Destination</label>
-                            <select
-                                onChange={handleChange}
-                                value={data.destinationName}
-                                name='destinationName'
-                                className="input-field border border-gray-500 rounded-lg p-2">
-                                <option>Dharamshala</option>
-                                <option>Shimla</option>
-                                <option>Pathankot</option>
-                                <option>Kullu</option>
-                            </select>
+                            <DestinationDropbox value={data.destinationName || ""} onSelect={(value: string) => handleChange(value,"destinationName")} />
                         </div>
 
                         {/* Pickup Place */}
                         <div className="flex flex-col">
                             <label className="font-medium">Pickup Place</label>
-                            <select
-                                onChange={handleChange}
-                                value={data.pickupLocationName}
-                                name='pickupLocationName'
-                                className="input-field border border-gray-500 rounded-lg p-2">
-                                <option>Dharamshala</option>
-                                <option>Shimla</option>
-                                <option>Pathankot</option>
-                                <option>Kullu</option>
-                            </select>
+                            <DestinationDropbox value={data.pickupLocationName || ""} onSelect={(value: string) => handleChange(value,"pickupLocationName")} />
                         </div>
 
                         {/* Drop Place */}
                         <div className="flex flex-col">
                             <label className="font-medium">Drop Place</label>
-                            <select
-                                onChange={handleChange}
-                                value={data.dropLocationName}
-                                name='dropLocationName'
-                                className="input-field border border-gray-500 rounded-lg p-2">
-                                <option>Dharamshala</option>
-                                <option>Shimla</option>
-                                <option>Pathankot</option>
-                                <option>Kullu</option>
-                            </select>
+                            <DestinationDropbox value={data.dropLocationName || ""} onSelect={(value: string) => handleChange(value,"dropLocationName")} />
                         </div>
 
                         {/* Tour Type */}
@@ -310,7 +284,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                             <div className="flex flex-col mt-2">
                                 <label className="font-medium">Driver</label>
                                 <select
-                                    onChange={handleChange}
+                                    onChange={(e)=>handleChange(e.target.value,"cabOwner")}
                                     value={data.cabOwner}
                                     name='cabOwner'
                                     className="input-field border border-gray-500 rounded-lg p-2">
@@ -327,7 +301,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         <div className="flex flex-col">
                             <label className="font-medium">Website</label>
                             <select
-                                onChange={handleChange}
+                                onChange={(e)=>handleChange(e.target.value,"websiteName")}
                                 value={data.websiteName}
                                 name='websiteName'
                                 className="input-field border border-gray-500 rounded-lg p-2">
@@ -340,7 +314,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         <div className="flex flex-col">
                             <label className="font-medium">Quotation</label>
                             <input
-                                onChange={handleChange}
+                                onChange={(e)=>handleChange(e.target.value,"quotation")}
                                 value={data.quotation}
                                 name='quotation'
                                 type="text" placeholder="Rs. 20000" className="input-field border border-gray-500 rounded-lg p-2" />
@@ -348,13 +322,12 @@ export default function NewQueries({ onClose }: ButtonClick) {
                         <div className="flex flex-col">
                             <label className="font-medium">Requirements</label>
                             <input
-                                onChange={handleChange}
+                                onChange={(e)=>handleChange(e.target.value,"requirements")}
                                 value={data.requirements}
                                 name='requirements'
                                 type="text" placeholder="ex - Travelling only at night" className="input-field border border-gray-500 rounded-lg p-2" />
                         </div>
                     </div>
-
 
                     {/* Submit Button */}
                     <div className="mt-6 text-center">

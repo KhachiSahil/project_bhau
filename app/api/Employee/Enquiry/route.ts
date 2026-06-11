@@ -131,7 +131,6 @@ export async function POST(req: NextRequest) {
             const bookedDates = cabDates.map((dateStr) => ({
                 date: new Date(dateStr),
                 cabBookingId: cabBooking.id,
-                cabOwnerId: cabOwnerData.id,
             }));
 
             await prisma.bookedDate.createMany({
@@ -139,7 +138,7 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        return NextResponse.json({ message: "Enquiry created successfully", enquiryId: enquiry.id }, { status: 201 });
+        return NextResponse.json({ message: "Enquiry created successfully", enquiryId: enquiry.id }, { status: 200 });
 
     } catch (error) {
         console.error("[ENQUIRY_CREATE_ERROR]", error);

@@ -107,10 +107,11 @@ export async function GET(req: NextRequest) {
         const pickupLocation = searchParams.get("pickup");
         const dropLocation = searchParams.get("drop");
         const destination = searchParams.get("destination");
+        console.log(pickupLocation)
         if (!pickupLocation || !dropLocation || !destination) {
             return NextResponse.json(
                 { error: "Data missing" },
-                { status: 400 }
+                { status: 404 }
             );
         }
 
@@ -144,7 +145,7 @@ export async function GET(req: NextRequest) {
         if (itinerary.length == 0) {
             return NextResponse.json(
                 { error: "Itinerary not found" },
-                { status: 404 }
+                { status: 204 }
             );
         }
 
