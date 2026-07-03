@@ -12,7 +12,7 @@ export default function WebsiteList() {
         {websiteList.map((website, index) => (
           <div
           onClick={()=>{
-            router.push(`/Employee/?website=${website}`)
+            router.push(`/Employee?website=${website}`)
           }}
             key={index}
             className="bg-gray-100 hover:bg-gray-200 hover:cursor-pointer border-2 border-black rounded-lg px-6 py-4 text-lg shadow-2xl font-semibold"

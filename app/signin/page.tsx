@@ -27,7 +27,7 @@ export default function SignIn() {
       if (role === 'admin') {
         router.push('/Admin')
       } else {
-        router.push('/Employee/Website')
+        router.push('Website')
       }
     }
 

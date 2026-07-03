@@ -1,25 +1,60 @@
 "use client"
+import RecentFollowups from "@/components/Employee/Dashboard/RecentFollowups";
 import StatCards from "@/components/Employee/Dashboard/StatCards";
 import { Mail, TrendingUp, PhoneCall, IndianRupee } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-const statsData = [
-  { id: 1, name: "Total Enquiries", total: "124", stats: "+12% from last time", Icon: Mail },
-  { id: 2, name: "Conversion Rate", total: "65%", stats: "+5% from last time", Icon: TrendingUp },
-  { id: 3, name: "Pending Follow Ups", total: "34", stats: "-3% from last time", Icon: PhoneCall },
-  { id: 4, name: "Revenue Generated", total: "₹1,20,000", stats: "+15% from last time", Icon: IndianRupee },
-];
 export default function Dashboard() {
-  const {data : session} = useSession();
+  const { data: session } = useSession();
   const params = useSearchParams();
+  const [statsData, setStatsData] = useState({
+    totalEnquiries: 0,
+    conversionRate: 0,
+    pendingFollowups: 0,
+    revenueGenerated: 0,
+  });
+
+  const cards = [
+    {
+      name: "Total Enquiries",
+      value: statsData.totalEnquiries,
+      Icon: Mail,
+    },
+    {
+      name: "Conversion Rate",
+      value: statsData.conversionRate,
+      Icon: TrendingUp,
+    },
+    {
+      name: "Pending Follow Ups",
+      value: statsData.pendingFollowups,
+      Icon: PhoneCall,
+    },
+    {
+      name: "Revenue Generated",
+      value: statsData.revenueGenerated,
+      Icon: IndianRupee,
+    },
+  ];
+
   useEffect(() => {
     const websiteName = params.get('website')
-    console.log(websiteName)
     if (websiteName !== null)
       localStorage.setItem('website', websiteName || "");
-  }, [session,params])
+
+    async function fetchData() {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Dashboard?type=Stats&empId=${session?.user.id}`)
+      const newData = await response.json();
+      setStatsData(newData);
+      console.log(statsData)
+    }
+
+    if (session?.user.id) {
+      fetchData()
+    }
+  }, [session, params])
 
   return (
     <div className="md:p-6 space-y-6">
@@ -28,9 +63,17 @@ export default function Dashboard() {
       </div>
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {statsData.map((data) => (
-          <StatCards key={data.id} name={data.name} total={data.total} stats={data.stats} Icon={data.Icon} />
+        {cards.map((card) => (
+          <StatCards
+            key={card.name}
+            name={card.name}
+            total={card.value}
+            Icon={card.Icon}
+          />
         ))}
+      </div>
+      <div>
+        <RecentFollowups />
       </div>
     </div>
   );
