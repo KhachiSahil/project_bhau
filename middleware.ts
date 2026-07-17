@@ -4,10 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 export default async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
+  if (pathname.startsWith('/api/auth')) {
+    return NextResponse.next();
+  }
 
   if (!token) {
     if (pathname.startsWith('/api/')) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.next();
     }
     return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_WEBSITE_URL}signin`, req.url));
   }

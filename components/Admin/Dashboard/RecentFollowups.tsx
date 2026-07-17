@@ -7,7 +7,7 @@ export default function RecentFollowups() {
     useEffect(() => {
         if (!session?.user?.id) return;
         async function fetchFollowups() {
-            const fetchedData = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Dashboard?type=Enquiries&empId=${session?.user.id}`);
+            const fetchedData = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Admin/Dashboard?type=Enquiries&empId=${session?.user.id}`);
             const resolvedData = await fetchedData.json();
             console.log(resolvedData)
             setEnquiries(resolvedData);

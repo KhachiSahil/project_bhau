@@ -12,19 +12,15 @@ export async function GET(req: NextRequest) {
             try {
                 const [totalEnquiries, conversionRate, pendingFollowUps, revenueGenerated] = await Promise.all([
                     prisma.enquiry.count({
-                        where: {
-                            employeeId: empId
-                        }
+                        where: {}
                     }),
                     prisma.enquiry.count({
                         where: {
-                            employeeId: empId,
                             status: "Completed"
                         }
                     }),
                     prisma.followUp.count({
                         where: {
-                            employeeId: empId,
                             date: {
                                 gte: new Date(),
                             },
@@ -32,7 +28,6 @@ export async function GET(req: NextRequest) {
                     }),
                     prisma.enquiry.aggregate({
                         where: {
-                            employeeId: empId,
                             status: "Completed"
                         },
                         _sum: {
@@ -58,8 +53,7 @@ export async function GET(req: NextRequest) {
                     where: {
                         date: {
                             gte: new Date()
-                        },
-                        employeeId: empId
+                        }
                     },
                     select: {
                         message: true,
@@ -82,7 +76,6 @@ export async function GET(req: NextRequest) {
                         }
                     }
                 })
-                console.log(empId)
                 return NextResponse.json(fetchedData, { status: 200 })
             } catch (err) {
                 return NextResponse.json({ "error": "Data not fetched" }, { status: 500 });

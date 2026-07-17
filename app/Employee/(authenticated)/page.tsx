@@ -1,6 +1,6 @@
 "use client"
 import RecentFollowups from "@/components/Employee/Dashboard/RecentFollowups";
-import StatCards from "@/components/Employee/Dashboard/StatCards";
+import StatCards from "@/components/StatCards";
 import { Mail, TrendingUp, PhoneCall, IndianRupee } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -22,8 +22,8 @@ export default function Dashboard() {
       value: statsData.totalEnquiries,
       Icon: Mail,
     },
-    {
-      name: "Conversion Rate",
+    { 
+      name: "Conversion Rate", 
       value: statsData.conversionRate,
       Icon: TrendingUp,
     },

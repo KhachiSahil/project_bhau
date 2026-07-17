@@ -20,14 +20,14 @@ export default function SignIn() {
       password,
       role,
     })
-
+    
     if (res?.error) {
       setError(res.error)
     } else if (res?.ok) {
       if (role === 'admin') {
         router.push('/Admin')
       } else {
-        router.push('Website')
+        router.push('/Website')
       }
     }
 
