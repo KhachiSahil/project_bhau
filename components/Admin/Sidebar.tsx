@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, Baby, MapPinCheck } from "lucide-react";
+import {Hammer, Home, FileText, CheckCircle, User, LogOut, Menu, ChartLine, SquareUser, CarTaxiFront, Baby, MapPinCheck, HotelIcon, GlobeX } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 
@@ -18,9 +18,10 @@ export default function EmployeeSideBar() {
     { name: "Follow Ups", path: "/Admin/FollowUps", icon: <CheckCircle size={20} /> },
     { name: "Reports", path: "/Admin/Reports", icon: <ChartLine size={20} /> },
     { name: "Itinerary", path: "/Admin/Itenary", icon: <Hammer size={20} /> },
-    { name: "Destination", path: "/Admin/Destination", icon: <MapPinCheck size={20} /> }
+    { name: "Destination", path: "/Admin/Destination", icon: <MapPinCheck size={20} /> },
+    { name: "Website", path: "/Admin/Website", icon: <GlobeX size={20} /> },
+    { name: "Hotel", path: "/Admin/Hotel", icon: <HotelIcon size={20} /> },
   ];
-
   return (
     <>
       {/* Sidebar Toggle Button */}

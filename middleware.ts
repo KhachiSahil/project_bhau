@@ -10,9 +10,8 @@ export default async function middleware(req: NextRequest) {
 
   if (!token) {
     if (pathname.startsWith('/api/')) {
-      return NextResponse.next();
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_WEBSITE_URL}signin`, req.url));
     }
-    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_WEBSITE_URL}signin`, req.url));
   }
 
   const role = token?.role;

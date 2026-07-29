@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
             prisma.website.upsert({
                 where: { name: websiteName },
                 update: {},
-                create: { name: websiteName },
+                create: { name: websiteName,url : "" },
             }),
             prisma.cabOwner.upsert({
                 where: { name: cabOwner },
@@ -167,7 +167,7 @@ export async function GET(req: NextRequest) {
         });
 
         if (!website) {
-            return NextResponse.json({ error: "Website not found" }, { status: 404 });
+            return NextResponse.json({ error: "Website not found" }, { status: 400 });
         }
 
         const skip = (page - 1) * limit;

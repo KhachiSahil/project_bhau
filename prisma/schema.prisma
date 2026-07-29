@@ -27,16 +27,19 @@ model Employee {
 }
 
 model Website {
-  id        String    @id @default(uuid()) @db.Uuid
-  name      String    @unique
-  enquiries Enquiry[]
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique
+  url         String
+  status      String    @default("Active")
+  description String    @default("")
+  enquiries   Enquiry[]
 }
 
 model Destination {
   id               String      @id @default(uuid()) @db.Uuid
   name             String      @unique
   price            Int         @default(0)
-  description      String       @default("")
+  description      String      @default("")
   pickupEnquiries  Enquiry[]   @relation("PickupLocation")
   dropEnquiries    Enquiry[]   @relation("DropLocation")
   generalEnquiries Enquiry[]   @relation("Destination")
