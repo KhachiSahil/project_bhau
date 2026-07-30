@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
         const pickupLocation = searchParams.get("pickup");
         const dropLocation = searchParams.get("drop");
         const destination = searchParams.get("destination");
-        console.log(pickupLocation)
+        console.log(pickupLocation + " " + dropLocation);
         if (!pickupLocation || !dropLocation || !destination) {
             return NextResponse.json(
                 { error: "Data missing" },
@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
         if (itinerary.length == 0) {
             return NextResponse.json(
                 { error: "Itinerary not found" },
-                { status: 204 }
+                { status: 200 }
             );
         }
 

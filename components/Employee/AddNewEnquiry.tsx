@@ -305,10 +305,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                                 value={data.websiteName}
                                 name='websiteName'
                                 className="input-field border border-gray-500 rounded-lg p-2">
-                                <option>ABC</option>
-                                <option>HIJ</option>
-                                <option>XYZ</option>
-                                <option>LMN</option>
+                                <option>TravelHangouts</option>
                             </select>
                         </div>
                         <div className="flex flex-col">

@@ -11,7 +11,6 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState("");
   const hotels = ["N/A", "Oberoi", "Taj", "Cecil"];
-  const airports = ["New Delhi Airport", "Mumbai Airport", "Dubai Airport", "Bali International Airport"];
   const status = ["Pending", "Completed", "Cancelled"];
 
   // Prevents the date-range useEffect from firing on initial data load
@@ -619,7 +618,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
           </div>
         )}
       </div>
-      <NotificationComponent pickupLocation={data?.pickupLocation.name} destination={data?.destination.name} dropLocation={data?.dropLocation.name}/>
+      {data?.destination.name && data.pickupLocation.name && data.dropLocation.name && data.Customer.name && <NotificationComponent customerName = {data.Customer.name} pickupLocation={data.pickupLocation.name} destination={data.destination.name} dropLocation={data?.dropLocation.name}/>}
     </div>
   );
 }

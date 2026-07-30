@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, X, Eye } from "lucide-react";
 import ViewItineraryHelper from "./Admin/Itenary/ViewItineraryhelper";
 
-export default function NotificationComponent({ pickupLocation, destination, dropLocation }: any) {
+export default function NotificationComponent({ customerName, pickupLocation, destination, dropLocation }: any) {
     const [isOpen, setIsOpen] = useState(false);
     const [data, setData] = useState();
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Itinerary?pickup=delhi&drop=chandigarh&destination=shimla`)
+                const data = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Itinerary?pickup=${pickupLocation}&drop=${dropLocation}&destination=${destination}`)
                 const renderData = await data.json();
                 setData(renderData.itinerary)
             } catch (err) {
@@ -31,7 +31,7 @@ export default function NotificationComponent({ pickupLocation, destination, dro
                 </div>
             </div>
 
-            {isOpen && <ModalComponent onClose={() => setIsOpen(false)} formData={data} pickupPlace={pickupLocation} destination={destination} dropPlace={dropLocation} />}
+            {isOpen && <ModalComponent onClose={() => setIsOpen(false)} formData={data} customerName={customerName} pickupPlace={pickupLocation} destination={destination} dropPlace={dropLocation} />}
         </>
     );
 }
@@ -40,9 +40,9 @@ type ModalProps = {
     onClose: () => void;
 };
 
-function ModalComponent({ onClose, formData, pickupPlace, dropPlace, destination }: any) {
+function ModalComponent({ onClose, formData, customerName, pickupPlace, dropPlace, destination }: any) {
     const [selectedItinerary, setSelectedItinerary] = useState<any>(null);
-    console.log(formData)
+
     return (
         <>
             {/* Side Panel */}
@@ -69,7 +69,7 @@ function ModalComponent({ onClose, formData, pickupPlace, dropPlace, destination
 
                     {/* Content */}
                     <div className="p-4 overflow-y-auto h-[calc(100%-120px)]">
-                        {formData.length > 0 ? (
+                        {formData && formData.length > 0 ? (
                             <div className="space-y-4">
                                 {formData.map((item: any) => (
                                     <div
@@ -108,7 +108,19 @@ function ModalComponent({ onClose, formData, pickupPlace, dropPlace, destination
                     </div>
                 </div>
                 {selectedItinerary && (
-                    <ViewItineraryHelper onClose={() => setSelectedItinerary(null)} formData={selectedItinerary} />
+                    <ViewItineraryHelper
+                        onClose={() => setSelectedItinerary(null)}
+                        // selectedItinerary is the raw Itinerary template record (days, description, ids only —
+                        // no pickupPlace/dropPlace/destination/arrivalDate). Merge in the place names we already
+                        // have from props so ViewItineraryHelper's formData shape is actually complete.
+                        formData={{
+                            ...selectedItinerary,
+                            pickupPlace,
+                            dropPlace,
+                            destination,
+                        }}
+                        customerName={customerName}
+                    />
                 )}
             </div>
         </>

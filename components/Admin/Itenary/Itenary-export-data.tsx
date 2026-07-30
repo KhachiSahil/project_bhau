@@ -63,36 +63,71 @@ export const buildDays = (arrivalDate: string, totalDays: number, pickupPlace: s
 
 // export to PDF function
 type editableContentTypes = {
-    adults: string,
-    children: string,
-    childrenAges: string,
-    transportationCost: string,
-    vehicle: string,
-    contactPerson: string,
-    contactNumber: string,
-    greeting: string,
-}
+    adults: string;
+    children: string;
+    childrenAges: string;
+    transportationCost: string;
+    vehicle: string;
+    contactPerson: string;
+    contactNumber: string;
+    greeting: string;
+};
 type itineraryDaysTypes = {
     day: number;
     date: string;
     title: string;
     description: string;
-}
-export const exportToPDF = (editableContent:editableContentTypes, itineraryDays:itineraryDaysTypes[], notes:string[]) => {
+};
+export const exportToPDF = (
+    editableContent: editableContentTypes,
+    itineraryDays: itineraryDaysTypes[],
+    notes: string[],
+    pickupLocation?: string,
+    dropLocation?: string
+) => {
     const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
+    if (!printWindow) {
+        alert("Please allow pop-ups for this site to export the PDF.");
+        return;
+    }
     const html = `
       <html><head><title>Tour Itinerary</title>
       <style>
+        * { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; padding: 30px; color: #000; max-width: 800px; margin: 0 auto; line-height: 1.6; }
-        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .header { text-align: center; border-bottom: 2px solid #111; padding-bottom: 20px; margin-bottom: 30px; }
         .company-name { font-size: 24px; font-weight: bold; }
-        .day-item { margin: 20px 0; padding: 15px; border-left: 4px solid #333; background: #f8f9fa; }
-        .day-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
-        .transport-section { background: #f0f0f0; padding: 20px; margin: 20px 0; }
-        .terms-section { border: 1px solid #ddd; padding: 20px; margin: 20px 0; }
-        .term-item { display: flex; gap: 8px; margin: 10px 0; }
-        .contact-section { background: #333; color: white; padding: 25px; text-align: center; margin-top: 20px; }
+
+        .day-item { position: relative; padding-left: 40px; margin: 16px 0; }
+        .day-badge {
+          position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 999px;
+          background: #111; color: #fff; font-size: 12px; font-weight: bold;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .day-connector {
+          position: absolute; left: 13px; top: 28px; bottom: -16px; width: 1px; background: #e5e5e5;
+        }
+        .day-card {
+          border: 1px solid #e5e5e5; border-radius: 12px; padding: 14px 16px;
+        }
+        .day-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+        .day-date { font-size: 11px; color: #888; font-weight: normal; margin-bottom: 6px; }
+        .day-desc { font-size: 13px; color: #333; }
+        .day-pill {
+          display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+          font-size: 11px; font-weight: 600; color: #444; background: #f5f5f5;
+          padding: 4px 10px; border-radius: 999px;
+        }
+
+        .transport-section { background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 12px; padding: 20px; margin: 24px 0; }
+        .terms-section { border: 1px solid #e5e5e5; border-radius: 12px; padding: 20px; margin: 24px 0; }
+        .term-item { display: flex; gap: 8px; margin: 10px 0; font-size: 13px; }
+        .contact-section { background: #111; color: white; padding: 25px; text-align: center; margin-top: 20px; border-radius: 12px; }
+        .section-heading { font-size: 18px; font-weight: bold; margin: 24px 0 12px; }
+
+        @media print {
+          @page { margin: 15mm; }
+        }
       </style></head>
       <body>
         <div class="header">
@@ -104,22 +139,42 @@ export const exportToPDF = (editableContent:editableContentTypes, itineraryDays:
           <p><strong>Greetings from Himachal Taxi Rental Service……</strong></p>
           <p><strong>Please find the below Tour Itinerary & Cost:</strong></p>
         </div>
-        <div style="font-size:18px;font-weight:bold;margin:20px 0 10px;">Itinerary:</div>
-        ${itineraryDays.map((day) => `
+        <div class="section-heading">Itinerary</div>
+        ${itineraryDays
+            .map((day, i) => {
+                const isFirst = i === 0;
+                const isLast = i === itineraryDays.length - 1;
+                const isNotLastInList = i < itineraryDays.length - 1;
+                const isValidLocation = (value?: string) =>
+                    !!value && value.trim().length > 0 && value.trim().toLowerCase() !== "undefined" && value.trim().toLowerCase() !== "null";
+                const pill = isFirst && isValidLocation(pickupLocation)
+                    ? `<div class="day-pill">📍 Pickup: ${pickupLocation}</div>`
+                    : isLast && isValidLocation(dropLocation)
+                        ? `<div class="day-pill">📍 Drop: ${dropLocation}</div>`
+                        : "";
+                return `
           <div class="day-item">
-            <div class="day-title">Day ${String(day.day).padStart(2, "0")}: ${day.date} ~ ${day.title}</div>
-            <div>${day.description}</div>
+            <div class="day-badge">${day.day}</div>
+            ${isNotLastInList ? '<div class="day-connector"></div>' : ""}
+            <div class="day-card">
+              <div class="day-title">${day.title}</div>
+              <div class="day-date">${day.date}</div>
+              <div class="day-desc">${day.description}</div>
+              ${pill}
+            </div>
           </div>
-        `).join("")}
+        `;
+            })
+            .join("")}
         <div class="transport-section">
-          <div style="font-size:18px;font-weight:bold;margin-bottom:12px;">Transportation (${itineraryDays.length - 1} Days)</div>
+          <div class="section-heading" style="margin-top:0;">Transportation (${itineraryDays.length - 1} Days)</div>
           <p><strong>Total Pax:</strong> ${editableContent.adults} Adults ${editableContent.children} Child${editableContent.childrenAges}</p>
           <p><strong>Transportation Cost:</strong> Rs ${editableContent.transportationCost}/- (Inclusive All Taxes + All Sightseeing)</p>
           <p><strong>Vehicle:</strong> ${editableContent.vehicle}</p>
           <p style="font-style:italic;color:#666;margin-top:10px;">(Inclusive All Taxes, Driver Allowances, Driver Perk, Driver Messing charges, Parking, Fuel, Tolls, Inter State Taxes, No Other Hidden Charges.)</p>
         </div>
         <div class="terms-section">
-          <div style="font-size:18px;font-weight:bold;margin-bottom:12px;">Also requesting you to:</div>
+          <div class="section-heading" style="margin-top:0;">Also requesting you to:</div>
           ${notes.map((note, i) => `<div class="term-item"><span><strong>${i + 1}.</strong></span><span>${note}</span></div>`).join("")}
         </div>
         <div class="contact-section">
@@ -132,7 +187,15 @@ export const exportToPDF = (editableContent:editableContentTypes, itineraryDays:
     `;
     printWindow.document.write(html);
     printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+
+    // Wait for content to finish rendering before printing, and let the browser
+    // close the tab itself once the print dialog is dismissed — closing it manually
+    // right after print() cuts the dialog off before it can do anything.
+    printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+    };
+    printWindow.onafterprint = () => {
+        printWindow.close();
+    };
 };

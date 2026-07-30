@@ -19,7 +19,7 @@ model Employee {
   password  String
   phone     String
   createdAt DateTime @default(now())
-
+  websites  Website[] @relation("EmployeeWebsites")
   enquiries Enquiry[]
   followUps FollowUp[]
 
@@ -33,6 +33,7 @@ model Website {
   status      String    @default("Active")
   description String    @default("")
   enquiries   Enquiry[]
+  employees   Employee[] @relation("EmployeeWebsites")
 }
 
 model Destination {
