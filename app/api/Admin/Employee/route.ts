@@ -48,7 +48,8 @@ export async function GET() {
             id: true,
             name: true,
             phone: true,
-            createdAt : true
+            createdAt : true,
+            websites : true
         }
     })
     if (!data) {

@@ -1,20 +1,27 @@
 "use client";
 import { LucideSearch, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
+import { EmployeeWebsiteModal } from "./EmployeeWebsiteModal";
+
+interface EmployeeWebsite {
+  id: string;
+  name: string;
+}
 
 interface employeeData {
+  id: string;
   name: string;
   phone: string;
   createdAt: Date;
+  websites?: EmployeeWebsite[];
 }
-
 
 export default function EmployeeTable() {
   const [employees, setEmployees] = useState<employeeData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState<employeeData[]>([]);
-  const [activeRow, setActiveRow] = useState<number | null>(null);
+  const [activeRow, setActiveRow] = useState<string | null>(null);
 
   useEffect(() => {
     const filtered = employees.filter((emp) =>
@@ -27,28 +34,30 @@ export default function EmployeeTable() {
     setSearchTerm(e.target.value);
   };
 
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Admin/Employee`,
+        { method: "GET" }
+      );
+      if (!response.ok) throw new Error("Failed to fetch Employees");
+      const employee = await response.json();
+      setEmployees(employee.data);
+      console.log(employee.data)
+      setFilteredEmployees(employee.data);
+    } catch (err) {
+      console.error("Error fetching employees:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Admin/Employee`,
-          {
-            method: "GET",
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch Employees");
-        const employee = await response.json();
-        setEmployees(employee.data);
-        setFilteredEmployees(employee.data);
-      } catch (err) {
-        console.error("Error fetching employees:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchEmployees();
   }, []);
+
+  const activeEmployee = employees.find((e) => e.id === activeRow) || null;
 
   return (
     <div className="md:p-8 bg-white rounded-xl shadow-lg w-full">
@@ -92,8 +101,15 @@ export default function EmployeeTable() {
               </tbody>
             ) : (
               <tbody>
-                {filteredEmployees.map((emp, index) => (
-                  <tr key={index} className="border-t">
+                {filteredEmployees.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-6 px-4 text-center text-gray-500">
+                      No employees found
+                    </td>
+                  </tr>
+                )}
+                {filteredEmployees.map((emp) => (
+                  <tr key={emp.id} className="border-t">
                     <td className="py-4 px-2 md:px-6">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full" />
@@ -109,14 +125,11 @@ export default function EmployeeTable() {
                       {new Date(emp.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-4 px-2 md:px-6 relative">
-                      {activeRow === index && (
-                        <ModalButton  />
-                      )}
                       <MoreHorizontal
                         className="text-gray-500 cursor-pointer"
                         size={26}
                         onClick={() =>
-                          setActiveRow((prev) => (prev === index ? null : index))
+                          setActiveRow((prev) => (prev === emp.id ? null : emp.id))
                         }
                       />
                     </td>
@@ -127,16 +140,14 @@ export default function EmployeeTable() {
           </table>
         </div>
       </div>
+
+      {activeEmployee && (
+        <EmployeeWebsiteModal
+          employee={activeEmployee}
+          onClose={() => setActiveRow(null)}
+          onUpdated={() => fetchEmployees()}
+        />
+      )}
     </div>
   );
 }
-
-const ModalButton = ({  }) => {
-  return (
-    <div className="absolute right-0 z-10 bg-white border shadow-md rounded-md p-2 mt-1 w-32">
-      <button className="block w-full text-left hover:bg-gray-100 px-3 py-1 text-sm">
-        Delete
-      </button>
-    </div>
-  );
-};
