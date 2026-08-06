@@ -18,7 +18,7 @@ model Employee {
   name      String     @unique
   password  String
   phone     String
-  isActive  Boolean     @default(true)
+  isActive  Boolean    @default(true)
   createdAt DateTime   @default(now())
   websites  Website[]  @relation("EmployeeWebsites")
   enquiries Enquiry[]
@@ -133,9 +133,31 @@ model CabOwner {
   id       String       @id @default(uuid()) @db.Uuid
   name     String       @unique
   phone    String
+  cabs     Cab[]
   bookings CabBooking[]
 
   @@index([name])
+}
+
+model Cab {
+  id          String @id @default(uuid()) @db.Uuid
+  model       String
+  plateNumber String @unique
+  seats       Int
+  type        String @default("Sedan")
+
+  owner   CabOwner @relation(fields: [ownerId], references: [id])
+  ownerId String   @db.Uuid
+
+  bookings CabBooking[]
+
+  @@index([ownerId])
+}
+
+model CarTypes {
+  id    String @id @default(uuid()) @db.Uuid
+  name  String @unique
+  Price String
 }
 
 model CabBooking {
@@ -147,10 +169,14 @@ model CabBooking {
   dropDate   DateTime
 
   bookedDates BookedDate[]
-  CabOwner    CabOwner     @relation(fields: [cabOwnerId], references: [id])
-  cabOwnerId  String       @db.Uuid
 
-  @@index([cabOwnerId, enquiryId])
+  cab   Cab    @relation(fields: [cabId], references: [id])
+  cabId String @db.Uuid
+
+  CabOwner   CabOwner @relation(fields: [cabOwnerId], references: [id])
+  cabOwnerId String   @db.Uuid
+
+  @@index([cabOwnerId, cabId, enquiryId])
 }
 
 model BookedDate {
