@@ -114,19 +114,32 @@ export async function POST(req: NextRequest) {
             .filter(([_, value]) => (value as { cab?: boolean }).cab)
             .map(([date]) => date);
 
-        let cabBookingId: string | null = null;
-
         if (cabDates.length > 0) {
+            let ownerCab = await prisma.cab.findFirst({
+                where: { ownerId: cabOwnerData.id },
+                select: { id: true },
+            });
+            if (!ownerCab) {
+                ownerCab = await prisma.cab.create({
+                    data: {
+                        model: "Standard Cab",
+                        plateNumber: `TEMP-${Date.now().toString().slice(-6)}`,
+                        seats: 4,
+                        type: "Sedan",
+                        ownerId: cabOwnerData.id,
+                    },
+                });
+            }
+
             const cabBooking = await prisma.cabBooking.create({
                 data: {
                     enquiryId: enquiry.id,
                     pickupDate: new Date(pickupDate),
                     dropDate: new Date(dropDate),
                     cabOwnerId: cabOwnerData.id,
+                    cabId: ownerCab.id,
                 },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            cabBookingId = cabBooking.id;
 
             const bookedDates = cabDates.map((dateStr) => ({
                 date: new Date(dateStr),

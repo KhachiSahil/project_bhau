@@ -329,79 +329,79 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
 
   /* ── render ── */
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/80 transition backdrop-blur-md p-4">
-      <div className="relative bg-white rounded-sm shadow-lg w-full md:w-[80vw] lg:w-[80vw] xl:w-[80vw] max-h-[80vh]">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/80 transition backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl"
+          className="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl z-10"
         >
-          ✖
+          &times;
         </button>
 
         {isLoading ? (
-          <div className="overflow-y-auto max-h-[80vh] p-6">Loading...</div>
+          <div className="overflow-y-auto max-h-[90vh] p-6 text-center text-gray-500">Loading enquiry details...</div>
         ) : (
-          <div className="overflow-y-auto max-h-[80vh] p-6">
-            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
+          <div className="overflow-y-auto max-h-[90vh] p-4 sm:p-6 md:p-8 space-y-6">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
               Booking Details
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* ── Left Side ── */}
               <div className="space-y-4">
 
                 {/* Customer Info */}
-                <div className="bg-white p-4 flex gap-5 rounded-sm shadow border border-gray-400">
-                  <div className="w-10 h-10 bg-gray-600 rounded-full" />
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">Customer Information</h3>
-                    <p className="text-gray-600 text-lg font-semibold">{data?.Customer?.name}</p>
+                <div className="bg-white p-4 flex gap-4 rounded-xl shadow-xs border border-gray-200">
+                  <div className="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0" />
+                  <div className="overflow-hidden">
+                    <h3 className="text-lg font-bold text-gray-900">Customer Information</h3>
+                    <p className="text-gray-800 text-base font-medium">{data?.Customer?.name}</p>
                     {isEditing ? (
                       <input
                         type="email"
                         value={data?.Customer?.email || ""}
                         onChange={(e) => handleChange(e.target.value, "Customer", "email")}
-                        className="text-gray-600 border border-gray-600 p-1 rounded-md text-lg font-semibold"
+                        className="text-gray-700 border border-gray-300 p-1.5 rounded-lg text-sm w-full mt-1"
                       />
                     ) : (
-                      <p className="text-gray-600 text-lg font-semibold">{data?.Customer?.email}</p>
+                      <p className="text-gray-600 text-sm truncate">{data?.Customer?.email}</p>
                     )}
-                    <p className="text-gray-500 font-bold">📞 {data?.Customer?.phone}</p>
+                    <p className="text-gray-500 text-sm font-semibold mt-1">📞 {data?.Customer?.phone}</p>
                   </div>
                 </div>
 
                 {/* Travel Info */}
-                <div className="bg-white p-4 rounded-sm shadow border border-gray-400">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Travel Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-white p-4 rounded-xl shadow-xs border border-gray-200">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">Travel Information</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     <p>
-                      <strong className="text-lg underline">Adults:</strong>{" "}
+                      <strong className="text-gray-700">Adults:</strong>{" "}
                       {isEditing ? (
                         <input
                           type="number"
                           value={data?.adults || 0}
                           onChange={(e) => handlePrimitiveChange(e, "adults")}
-                          className="w-full border p-2 rounded-md"
+                          className="w-full border p-1.5 rounded-lg mt-0.5"
                         />
                       ) : (
                         data?.adults
                       )}
                     </p>
                     <p>
-                      <strong className="text-lg underline">Kids:</strong>{" "}
+                      <strong className="text-gray-700">Kids:</strong>{" "}
                       {isEditing ? (
                         <input
                           type="number"
                           value={data?.kids || 0}
                           onChange={(e) => handlePrimitiveChange(e, "kids")}
-                          className="w-full border p-2 rounded-md"
+                          className="w-full border p-1.5 rounded-lg mt-0.5"
                         />
                       ) : (
                         data?.kids
                       )}
                     </p>
                     <div>
-                      <strong className="text-lg underline">Destination:</strong>{" "}
+                      <strong className="text-gray-700">Destination:</strong>{" "}
                       {isEditing ? (
                         <DestinationDropbox value={data?.destination?.name || ""} onSelect={(value: string) => handleChange(value, "destination", "name")} />
                       ) : (
@@ -409,7 +409,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       )}
                     </div>
                     <div>
-                      <strong className="text-lg underline">Pickup:</strong>{" "}
+                      <strong className="text-gray-700">Pickup:</strong>{" "}
                       {isEditing ? (
                         <DestinationDropbox value={data?.pickupLocation?.name || ""} onSelect={(value: string) => handleChange(value, "pickupLocation", "name")} />
                       ) : (
@@ -417,7 +417,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       )}
                     </div>
                     <div>
-                      <strong className="text-lg underline">Drop:</strong>{" "}
+                      <strong className="text-gray-700">Drop:</strong>{" "}
                       {isEditing ? (
                         <DestinationDropbox value={data?.dropLocation?.name || ""} onSelect={(value: string) => handleChange(value, "destination", "name")} />
                       ) : (
@@ -425,26 +425,26 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                       )}
                     </div>
                     <p>
-                      <strong className="text-lg underline">Arrival Date:</strong>{" "}
+                      <strong className="text-gray-700">Arrival Date:</strong>{" "}
                       {isEditing ? (
                         <input
                           type="date"
                           value={data?.pickupDate?.split("T")[0] || ""}
                           onChange={(e) => handlePrimitiveChange(e, "pickupDate")}
-                          className="w-full border p-2 rounded-md"
+                          className="w-full border p-1.5 rounded-lg mt-0.5"
                         />
                       ) : (
                         data?.pickupDate?.split("T")[0]
                       )}
                     </p>
                     <p>
-                      <strong className="text-lg underline">End Date:</strong>{" "}
+                      <strong className="text-gray-700">End Date:</strong>{" "}
                       {isEditing ? (
                         <input
                           type="date"
                           value={data?.dropDate?.split("T")[0] || ""}
                           onChange={(e) => handlePrimitiveChange(e, "dropDate")}
-                          className="w-full border p-2 rounded-md"
+                          className="w-full border p-1.5 rounded-lg mt-0.5"
                         />
                       ) : (
                         data?.dropDate?.split("T")[0]
@@ -452,12 +452,12 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                     </p>
                     <div>
                       <p>
-                        <strong className="text-lg underline">Status:</strong>{" "}
+                        <strong className="text-gray-700">Status:</strong>{" "}
                         {isEditing ? (
                           <select
                             value={data?.status || ""}
                             onChange={(e) => handlePrimitiveChange(e, "status")}
-                            className="w-full border p-2 rounded-md"
+                            className="w-full border p-1.5 rounded-lg mt-0.5"
                           >
                             {status.map((st) => (
                               <option key={st} value={st}>{st}</option>
@@ -472,17 +472,18 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                 </div>
 
                 {/* Cab & Hotel Booking Table */}
-                <div className="mb-6 bg-white p-4 rounded-sm shadow border border-gray-400">
-                  <h3 className="text-xl font-bold mb-2">Cab / Hotel Booking Dates</h3>
-                  <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-gray-200">
-                        <th className="border border-gray-300 p-2">Date</th>
-                        <th className="border border-gray-300 p-2">Cab Required</th>
-                        <th className="border border-gray-300 p-2">Hotel Required</th>
-                        <th className="border border-gray-300 p-2">Hotel Name</th>
-                      </tr>
-                    </thead>
+                <div className="mb-6 bg-white p-4 rounded-xl shadow-xs border border-gray-200">
+                  <h3 className="text-lg font-bold mb-3 text-gray-900">Cab / Hotel Booking Dates</h3>
+                  <div className="w-full overflow-x-auto border border-gray-200 rounded-lg">
+                    <table className="w-full border-collapse text-xs sm:text-sm min-w-[340px]">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border-b border-gray-200 p-2 text-left">Date</th>
+                          <th className="border-b border-gray-200 p-2 text-center">Cab</th>
+                          <th className="border-b border-gray-200 p-2 text-center">Hotel</th>
+                          <th className="border-b border-gray-200 p-2 text-left">Hotel Name</th>
+                        </tr>
+                      </thead>
                     <tbody>
                       {generateDates().map((date) => {
                         const cabBooked = data?.cabBookings?.some((cb) =>
@@ -537,6 +538,7 @@ export default function Modal({ enquiryId, onClose }: ModalProps) {
                     </tbody>
                   </table>
                 </div>
+              </div>
 
                 {/* Quotations */}
                 <div>

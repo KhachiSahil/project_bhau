@@ -107,7 +107,7 @@ export default function Enquiries() {
           <input
             type="text"
             placeholder="Search enquiries..."
-            className="border z-0 rounded-md w-36 pl-2 md:px-4 py-2 text-sm md:text-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="border z-0 rounded-xl w-full sm:w-48 md:w-64 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -135,9 +135,8 @@ export default function Enquiries() {
           <div className="mx-auto my-5 text-gray-500 font-bold text-xl">Loading your enquiries...</div>
         </div>
       ) : (
-        <div className="w-[95vw] md:w-auto">
-          <div className="overflow-x-auto w-full">
-            <table className="w-full text-left border-collapse">
+        <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
                 <tr className="text-black text-sm md:text-xl border-b p-2 border-gray-300">
                   <th className="py-4 px-4">Customer</th>
@@ -193,7 +192,6 @@ export default function Enquiries() {
                 ))}
               </tbody>
             </table>
-          </div>
         </div>
       )}
 

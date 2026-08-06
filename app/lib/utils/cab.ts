@@ -1,13 +1,13 @@
-interface Cab {
+export interface Cab {
     id: string;
     ownerId: string;
     model: string;
     plateNumber: string;
     seats: number;
-    type: "Sedan" | "SUV" | "Tempo Traveller" | "Hatchback";
+    type: string;
 }
- 
-interface CabOwner {
+
+export interface CabOwner {
     id: string;
     name: string;
     phone: string;
@@ -22,7 +22,10 @@ export function ownerColor(ownerId: string, owners: CabOwner[]) {
 }
 
 export function toISODate(d: Date) {
-    return d.toISOString().slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
 }
 
 export function buildMonthGrid(year: number, month: number) {

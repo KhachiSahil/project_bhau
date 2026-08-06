@@ -12,13 +12,13 @@ export default function CabPageHeader({ search, onSearchChange, onAddOwner }: Pr
                 <p className="text-gray-500">Owners, their cabs, and where each one is booked</p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
                 <input
                     type="text"
                     placeholder="Search owner, model, or plate..."
                     value={search}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="border border-gray-300 rounded-xl px-4 py-2 w-72 focus:outline-none focus:ring-2 focus:ring-black"
+                    className="border border-gray-300 rounded-xl px-4 py-2 w-full sm:w-64 md:w-72 focus:outline-none focus:ring-2 focus:ring-black"
                 />
                 <button
                     onClick={onAddOwner}

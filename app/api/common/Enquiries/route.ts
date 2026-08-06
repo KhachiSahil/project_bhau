@@ -164,37 +164,50 @@ export async function POST(req: NextRequest) {
           ? new Date(cabSrc.dropDate)
           : new Date(dropDate);
 
-        const cabRow = existingCab
-          ? await tx.cabBooking.update({
-              where: { id: existingCab.id },
-              data: {
-                pickupDate: cabPickup,
-                dropDate: cabDrop,
-                cabOwnerId: cabSrc.CabOwner.id,
-              },
-            })
-          : await tx.cabBooking.create({
-              data: {
-                pickupDate: cabPickup,
-                dropDate: cabDrop,
-                enquiryId: enquiry.id,
-                cabOwnerId: cabSrc.CabOwner.id,
-              },
-            });
-
-        // Delete all existing booked dates for this booking, then recreate
-        await tx.bookedDate.deleteMany({
-          where: { cabBookingId: cabRow.id },
-        });
-
-        if (cabSrc.bookedDates?.length) {
-          await tx.bookedDate.createMany({
-            data: cabSrc.bookedDates.map((bd: any) => ({
-              cabBookingId: cabRow.id,
-              // no cabOwnerId — removed from BookedDate model
-              date: new Date(bd.date),
-            })),
+        let resolvedCabId = cabSrc.cabId || cabSrc.cab?.id;
+        if (!resolvedCabId && cabSrc.CabOwner?.id) {
+          const ownerCab = await tx.cab.findFirst({
+            where: { ownerId: cabSrc.CabOwner.id },
+            select: { id: true },
           });
+          resolvedCabId = ownerCab?.id;
+        }
+
+        if (resolvedCabId && cabSrc.CabOwner?.id) {
+          const cabRow = existingCab
+            ? await tx.cabBooking.update({
+                where: { id: existingCab.id },
+                data: {
+                  pickupDate: cabPickup,
+                  dropDate: cabDrop,
+                  cabOwnerId: cabSrc.CabOwner.id,
+                  cabId: resolvedCabId,
+                },
+              })
+            : await tx.cabBooking.create({
+                data: {
+                  pickupDate: cabPickup,
+                  dropDate: cabDrop,
+                  enquiryId: enquiry.id,
+                  cabOwnerId: cabSrc.CabOwner.id,
+                  cabId: resolvedCabId,
+                },
+              });
+
+          // Delete all existing booked dates for this booking, then recreate
+          await tx.bookedDate.deleteMany({
+            where: { cabBookingId: cabRow.id },
+          });
+
+          if (cabSrc.bookedDates?.length) {
+            await tx.bookedDate.createMany({
+              data: cabSrc.bookedDates.map((bd: any) => ({
+                cabBookingId: cabRow.id,
+                // no cabOwnerId — removed from BookedDate model
+                date: new Date(bd.date),
+              })),
+            });
+          }
         }
       }
 

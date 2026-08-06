@@ -80,65 +80,63 @@ export default function EmployeeTable() {
         </div>
       </div>
 
-      <div className="w-[95vw] md:w-auto">
-        <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse text-base md:text-lg">
-            <thead>
-              <tr className="bg-gray-100 text-left text-gray-600 uppercase font-semibold">
-                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Employee</th>
-                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Phone no.</th>
-                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Created At</th>
-                <th className="py-4 px-2 md:px-6 whitespace-nowrap">Actions</th>
+      <div className="w-full overflow-x-auto">
+        <table className="w-full border-collapse text-base md:text-lg min-w-[600px]">
+          <thead>
+            <tr className="bg-gray-100 text-left text-gray-600 uppercase font-semibold">
+              <th className="py-4 px-3 md:px-6 whitespace-nowrap">Employee</th>
+              <th className="py-4 px-3 md:px-6 whitespace-nowrap">Phone no.</th>
+              <th className="py-4 px-3 md:px-6 whitespace-nowrap">Created At</th>
+              <th className="py-4 px-3 md:px-6 whitespace-nowrap">Actions</th>
+            </tr>
+          </thead>
+          {loading ? (
+            <tbody>
+              <tr>
+                <td colSpan={4} className="py-6 px-4 text-center">
+                  Loading...
+                </td>
               </tr>
-            </thead>
-            {loading ? (
-              <tbody>
+            </tbody>
+          ) : (
+            <tbody>
+              {filteredEmployees.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-6 px-4 text-center">
-                    Loading...
+                  <td colSpan={4} className="py-6 px-4 text-center text-gray-500">
+                    No employees found
                   </td>
                 </tr>
-              </tbody>
-            ) : (
-              <tbody>
-                {filteredEmployees.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="py-6 px-4 text-center text-gray-500">
-                      No employees found
-                    </td>
-                  </tr>
-                )}
-                {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="border-t">
-                    <td className="py-4 px-2 md:px-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full" />
-                        <div>
-                          <p className="font-bold text-lg md:text-xl">{emp.name}</p>
-                        </div>
+              )}
+              {filteredEmployees.map((emp) => (
+                <tr key={emp.id} className="border-t">
+                  <td className="py-4 px-3 md:px-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="w-9 h-9 md:w-12 md:h-12 bg-gray-200 rounded-full flex-shrink-0" />
+                      <div>
+                        <p className="font-bold text-base md:text-xl">{emp.name}</p>
                       </div>
-                    </td>
-                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">
-                      {emp.phone}
-                    </td>
-                    <td className="py-4 px-2 md:px-6 font-semibold text-gray-700">
-                      {new Date(emp.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 px-2 md:px-6 relative">
-                      <MoreHorizontal
-                        className="text-gray-500 cursor-pointer"
-                        size={26}
-                        onClick={() =>
-                          setActiveRow((prev) => (prev === emp.id ? null : emp.id))
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            )}
-          </table>
-        </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-3 md:px-6 font-semibold text-gray-700 whitespace-nowrap">
+                    {emp.phone}
+                  </td>
+                  <td className="py-4 px-3 md:px-6 font-semibold text-gray-700 whitespace-nowrap">
+                    {new Date(emp.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="py-4 px-3 md:px-6 relative">
+                    <MoreHorizontal
+                      className="text-gray-500 cursor-pointer hover:text-black"
+                      size={26}
+                      onClick={() =>
+                        setActiveRow((prev) => (prev === emp.id ? null : emp.id))
+                      }
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
       </div>
 
       {activeEmployee && (

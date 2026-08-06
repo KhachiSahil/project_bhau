@@ -6,19 +6,20 @@ interface StatCards {
     Icon : LucideIcon
 }
 
-export default function StatCards({ name, total, Icon }:StatCards) {
+export default function StatCards({ name, total, Icon }: StatCards) {
     return (
-      <div className="bg-white shadow-md rounded-lg p-4 flex flex-col">
-
-        <div className="flex justify-between items-center">
-          <div className="text-lg font-semibold">{name}</div>
-          <div className="bg-blue-500 text-white p-2 rounded-full">
-            <Icon size={20} />
+      <div className="bg-white shadow-xs border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200">
+        <div className="flex justify-between items-center gap-2">
+          <span className="text-sm sm:text-base font-medium text-gray-600 truncate">{name}</span>
+          <div className="bg-black text-white p-2.5 rounded-xl shrink-0">
+            <Icon size={18} />
           </div>
         </div>
   
-        <div className="text-3xl font-bold mt-3">{total}</div>
+        <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-4 tracking-tight">
+          {total}
+        </div>
       </div>
     );
-  }
+}
   

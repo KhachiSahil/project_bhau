@@ -1,4 +1,4 @@
-import { ownerColor, toISODate } from "@/app/lib/utils/cab";
+import { ownerColor, toISODate, Cab, CabOwner } from "@/app/lib/utils/cab";
 
 interface Props {
     date: Date;
@@ -6,21 +6,6 @@ interface Props {
     dayBookings: Booking[];
     allCabs: Cab[];
     owners: CabOwner[];
-}
-export interface Cab {
-    id: string;
-    ownerId: string;
-    model: string;
-    plateNumber: string;
-    seats: number;
-    type: "Sedan" | "SUV" | "Tempo Traveller" | "Hatchback";
-}
- 
-export interface CabOwner {
-    id: string;
-    name: string;
-    phone: string;
-    cabs: Cab[];
 }
  
 export interface Booking {
@@ -33,8 +18,8 @@ export interface Booking {
 
 export default function CalendarDayCell({ date, isToday, dayBookings, allCabs, owners }: Props) {
     return (
-        <div className={`min-h-[84px] rounded-lg border p-1.5 ${isToday ? "border-black" : "border-gray-100"}`}>
-            <p className={`text-xs mb-1 ${isToday ? "font-bold text-black" : "text-gray-400"}`}>{date.getDate()}</p>
+        <div className={`min-h-[48px] sm:min-h-[72px] rounded-lg border p-0.5 sm:p-1.5 ${isToday ? "border-black bg-gray-50" : "border-gray-100"}`}>
+            <p className={`text-[10px] sm:text-xs mb-0.5 sm:mb-1 ${isToday ? "font-bold text-black" : "text-gray-400"}`}>{date.getDate()}</p>
             <div className="space-y-1">
                 {dayBookings.slice(0, 2).map((b) => {
                     const cab = allCabs.find((c) => c.id === b.cabId);

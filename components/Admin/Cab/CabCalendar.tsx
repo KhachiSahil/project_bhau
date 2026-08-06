@@ -1,23 +1,7 @@
-import { buildMonthGrid, toISODate } from "@/app/lib/utils/cab";
+import { buildMonthGrid, toISODate, Cab, CabOwner } from "@/app/lib/utils/cab";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDayCell from "./CalendarDayCell";
 import CalendarLegend from "./CalendarLegend";
-
-interface Cab {
-    id: string;
-    ownerId: string;
-    model: string;
-    plateNumber: string;
-    seats: number;
-    type: "Sedan" | "SUV" | "Tempo Traveller" | "Hatchback";
-}
- 
-interface CabOwner {
-    id: string;
-    name: string;
-    phone: string;
-    cabs: Cab[];
-}
  
 interface Booking {
     id: string;
@@ -77,12 +61,13 @@ export default function CabCalendar({
             <div className="grid grid-cols-7 mb-1">
                 {WEEKDAYS.map((d) => (
                     <div key={d} className="text-xs font-medium text-gray-400 text-center py-2">
-                        {d}
+                        <span className="hidden sm:inline">{d}</span>
+                        <span className="sm:hidden">{d[0]}</span>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                 {monthCells.map((date, i) =>
                     date ? (
                         <CalendarDayCell
@@ -94,7 +79,7 @@ export default function CabCalendar({
                             owners={owners}
                         />
                     ) : (
-                        <div key={i} className="min-h-[84px]" />
+                        <div key={i} className="min-h-[48px] sm:min-h-[72px]" />
                     )
                 )}
             </div>

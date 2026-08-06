@@ -46,8 +46,8 @@ export default function AddEmployee({ onClose }: funType) {
   };
 
   return (
-    <div className="fixed overflow-y-auto pt-56 md:pt-0 inset-0 flex items-center justify-center bg-black/70 bg-opacity-50 z-50 p-4">
-      <div className="bg-white w-full max-w-4xl rounded-xl shadow-2xl p-8 md:p-10">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50 p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center">
           <h2 className="text-2xl md:text-3xl font-semibold">

@@ -81,33 +81,33 @@ export default function GenerateItenary({onClose, formData }: any) {
       <div className="bg-white text-black max-w-5xl w-full max-h-[90vh] rounded-lg shadow-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="bg-black text-white p-6 flex justify-between items-center">
+        <div className="bg-black text-white p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold">Tour Itinerary & Cost</h2>
-            <p className="text-gray-300 mt-1">Himachal Taxi Rental Service</p>
+            <h2 className="text-xl sm:text-2xl font-bold">Tour Itinerary & Cost</h2>
+            <p className="text-gray-300 text-xs sm:text-sm mt-0.5">Himachal Taxi Rental Service</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-end">
             <button
-              onClick={()=>{handleItinerarySave(),onClose()}}
-              className={`flex items-center gap-2 px-4 py-2  text-white rounded transition-colors text-sm font-medium ${isEditing ? "bg-gray-800 cursor-not-allowed" : "bg-green-900  hover:bg-green-700 "}`}
+              onClick={()=>{handleItinerarySave(); onClose();}}
+              className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-white rounded transition-colors text-xs sm:text-sm font-medium ${isEditing ? "bg-gray-800 cursor-not-allowed" : "bg-green-900 hover:bg-green-700"}`}
               disabled={isEditing}
             >
-              <><Save size={16} /> Save</>
+              <Save size={16} /> Save
             </button>
             <button
               onClick={() => exportToPDF(editableContent, itineraryDays, notes)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs sm:text-sm font-medium"
             >
               <Download size={16} /> Export PDF
             </button>
             <button
               onClick={() => setIsEditing((e) => !e)}
-              className="flex items-center gap-2 px-3 py-2 bg-white text-black rounded hover:bg-gray-100 transition-colors text-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-black rounded hover:bg-gray-100 transition-colors text-xs sm:text-sm font-medium"
             >
               {isEditing ? <><Save size={16} /> Save</> : <><Edit3 size={16} /> Edit</>}
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-gray-800 rounded-full transition-colors">
-              <X size={20} />
+            <button onClick={onClose} className="p-1.5 sm:p-2 hover:bg-gray-800 rounded-full transition-colors">
+              <X size={18} />
             </button>
           </div>
         </div>

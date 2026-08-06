@@ -1,20 +1,4 @@
-import { ownerColor } from "@/app/lib/utils/cab";
-
-interface Cab {
-    id: string;
-    ownerId: string;
-    model: string;
-    plateNumber: string;
-    seats: number;
-    type: "Sedan" | "SUV" | "Tempo Traveller" | "Hatchback";
-}
- 
-interface CabOwner {
-    id: string;
-    name: string;
-    phone: string;
-    cabs: Cab[];
-}
+import { ownerColor, Cab, CabOwner } from "@/app/lib/utils/cab";
 interface Props {
     owners: CabOwner[];
 }
