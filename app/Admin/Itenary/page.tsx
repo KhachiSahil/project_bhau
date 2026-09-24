@@ -6,8 +6,7 @@ import ViewItenary from '@/components/Admin/Itenary/ViewItenary';
 
 const Itinerary: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-    arrivalDate: '',
-    endDate: '',
+    days : 0,
     destination: '',
     pickupPlace: '',
     dropPlace: '',
@@ -22,8 +21,8 @@ const Itinerary: React.FC = () => {
   };
 
   const handleSubmit = (value: "View" | "Generate") => {
-    const { arrivalDate, endDate, destination, pickupPlace, dropPlace } = formData;
-    if (arrivalDate && endDate && destination && pickupPlace && dropPlace) {
+    const { days, destination, pickupPlace, dropPlace } = formData;
+    if (days && destination && pickupPlace && dropPlace) {
       setItenary(value)
       setShowGenerateItenary(true);
     } else {

@@ -81,6 +81,7 @@ export default function Enquiries() {
     return enquiries.filter((enquiry) => {
       const matchStatus = selectedTab === "All" || enquiry.status === selectedTab;
       const matchSearch =
+        String(enquiry.id).toLowerCase().includes(searchQuery.toLowerCase()) ||
         enquiry.Customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         enquiry.Customer?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         enquiry.Customer?.phone?.includes(searchQuery);
@@ -144,48 +145,64 @@ export default function Enquiries() {
                 </tr>
               </thead>
               <tbody>
-                {filteredEnquiries.map((enquiry) => (
-                  <tr key={enquiry.id} className="border-b last:border-none text-sm md:text-lg">
-                    <td className="py-4 md:py-2 px-4">
-                      <div className="flex flex-col">
-                        <span className="font-bold">{enquiry.Customer.name}</span>
-                        <span className="font-medium text-sm">{enquiry.Customer.email}</span>
-                        <span className="text-sm font-medium">{enquiry.Customer.phone}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 md:py-2 px-4">
-                      <div className="flex flex-col">
-                        <span>{enquiry.pickupLocation.name}</span>
-                        <span>{enquiry.dropLocation.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 md:py-2 px-4">{enquiry.quotation}</td>
-                    <td className="py-4 md:py-2 px-4 whitespace-nowrap">
-                      <span>{enquiry.pickupDate.split("T")[0]}</span>
-                      <span className="block">{enquiry.dropDate.split("T")[0]}</span>
-                    </td>
-                    <td className="py-4 md:py-2 px-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs md:text-lg font-bold ${statusColors[enquiry.status as StatusType]}`}
-                      >
-                        {enquiry.status}
-                      </span>
-                    </td>
-                    <td className="py-4 md:py-2 px-4 h-full align-middle">
-                      <div className="flex justify-center gap-3 h-full">
-                        <button
-                          onClick={() => {
-                            setIsModal(true);
-                            setEnqNumber(enquiry.id);
-                          }}
-                          className="hover:text-gray-600"
-                        >
-                          <Eye size={20} />
-                        </button>
+                {filteredEnquiries.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-16 text-center text-gray-400">
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-4xl">🔍</span>
+                        <span className="text-lg font-medium text-gray-500">No enquiries found</span>
+                        <span className="text-sm text-gray-400">
+                          {searchQuery
+                            ? `No results for "${searchQuery}"`
+                            : `No ${selectedTab !== "All" ? selectedTab.toLowerCase() : ""} enquiries yet`}
+                        </span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredEnquiries.map((enquiry) => (
+                    <tr key={enquiry.id} className="border-b last:border-none text-sm md:text-lg">
+                      <td className="py-4 md:py-2 px-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold">{enquiry.Customer.name}</span>
+                          <span className="font-medium text-sm">{enquiry.Customer.email}</span>
+                          <span className="text-sm font-medium">{enquiry.Customer.phone}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 md:py-2 px-4">
+                        <div className="flex flex-col">
+                          <span>{enquiry.pickupLocation.name}</span>
+                          <span>{enquiry.dropLocation.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 md:py-2 px-4">{enquiry.quotation}</td>
+                      <td className="py-4 md:py-2 px-4 whitespace-nowrap">
+                        <span>{enquiry.pickupDate.split("T")[0]}</span>
+                        <span className="block">{enquiry.dropDate.split("T")[0]}</span>
+                      </td>
+                      <td className="py-4 md:py-2 px-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs md:text-lg font-bold ${statusColors[enquiry.status as StatusType]}`}
+                        >
+                          {enquiry.status}
+                        </span>
+                      </td>
+                      <td className="py-4 md:py-2 px-4 h-full align-middle">
+                        <div className="flex justify-center gap-3 h-full">
+                          <button
+                            onClick={() => {
+                              setIsModal(true);
+                              setEnqNumber(enquiry.id);
+                            }}
+                            className="hover:text-gray-600"
+                          >
+                            <Eye size={20} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
         </div>

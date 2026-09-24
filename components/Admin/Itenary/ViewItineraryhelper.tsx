@@ -29,8 +29,8 @@ interface EditableItineraryContent {
 interface Props {
     onClose: () => void;
     formData: {
-        arrivalDate: string;
-        endDate: string;
+        arrivalDate?: string;
+        endDate?: string;
         destination: string;
         pickupPlace: string;
         dropPlace: string;
@@ -59,10 +59,14 @@ export default function ViewItineraryHelper({ onClose, formData, customerName }:
     const [itineraryDays, setItineraryDays] = useState<ItineraryDay[]>(() =>
         formData.description.map((d, i) => {
             if (!isBlank(d.date)) return d;
-            const base = new Date(formData.arrivalDate);
-            if (isNaN(base.getTime())) return { ...d, date: "" }; // arrivalDate itself missing/unparseable — leave blank rather than crash
-            base.setDate(base.getDate() + i);
-            return { ...d, date: formatDate(base.toISOString()) };
+            // Backfill: try using arrivalDate if available, otherwise label as "Day N"
+            if (formData.arrivalDate) {
+                const base = new Date(formData.arrivalDate);
+                if (isNaN(base.getTime())) return { ...d, date: `Day ${i + 1}` };
+                base.setDate(base.getDate() + i);
+                return { ...d, date: formatDate(base.toISOString()) };
+            }
+            return { ...d, date: `Day ${i + 1}` };
         })
     );
 
@@ -145,6 +149,11 @@ export default function ViewItineraryHelper({ onClose, formData, customerName }:
                         )}
                         <p className="mt-2 font-bold">Greetings from Himachal Taxi Rental Service……</p>
                         <p className="mt-2 font-bold">Please find the below Tour Itinerary & Cost:</p>
+                    </div>
+
+                    {/* Highlighted Notification */}
+                    <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 my-6 rounded shadow-sm text-center font-bold text-sm sm:text-base">
+                      🚨 Note: Drop and pickup location will be Airport/Railway Station or Bus Stand.
                     </div>
 
                     {/* Itinerary */}

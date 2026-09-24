@@ -2,8 +2,7 @@ import React from 'react';
 import InputField from './InputField';
 
 export interface FormData {
-  arrivalDate: string;
-  endDate: string;
+  days: number;
   destination: string;
   pickupPlace: string;
   dropPlace: string;
@@ -19,18 +18,12 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({ formData, onChange, onSub
   return (
     <div className="space-y-4">
       <InputField
-        label="Arrival Date"
-        name="arrivalDate"
-        value={formData.arrivalDate}
+        label="Days"
+        name="days"
+        min = {1}
+        value={String(formData.days)}
         onChange={onChange}
-        type="date"
-      />
-      <InputField
-        label="End Date"
-        name="endDate"
-        value={formData.endDate}
-        onChange={onChange}
-        type="date"
+        type="number"
       />
       <InputField
         label="Destination"

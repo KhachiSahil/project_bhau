@@ -274,6 +274,10 @@
               <p><strong>Greetings from Himachal Taxi Rental Service……</strong></p>
               <p><strong>Please find the below Tour Itinerary & Cost:</strong></p>
             </div>
+            
+            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; color: #856404; padding: 15px; margin: 20px 0; border-radius: 4px; text-align: center; font-weight: bold; font-size: 14px;">
+              🚨 Note: Drop and pickup location will be Airport/Railway Station or Bus Stand.
+            </div>
 
             <div class="section-title">Itinerary:</div>
             ${itineraryDays.map(day => `
@@ -369,6 +373,11 @@
               <p className="font-bold text-lg">Dear Sir,</p>
               <p className="mt-2 font-bold">Greetings from Himachal Taxi Rental Service……</p>
               <p className="mt-2 font-bold">Please find the below Tour Itinerary & Cost:</p>
+            </div>
+            
+            {/* Highlighted Notification */}
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 my-6 rounded shadow-sm text-center font-bold text-sm sm:text-base">
+              🚨 Note: Drop and pickup location will be Airport/Railway Station or Bus Stand.
             </div>
 
             {/* Itinerary Section */}

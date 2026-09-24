@@ -28,32 +28,24 @@ export const formatDate = (dateString: string) => {
     return `${getOrdinal(day)} ${month} ${year}`;
 };
 
-// building the format to build days list
-export const buildDays = (arrivalDate: string, totalDays: number, pickupPlace: string, destination: string, dropPlace: string) => {
-    const startDate = new Date(arrivalDate);
+// building the days list — purely day-number based, no calendar dates
+export const buildDays = (totalDays: number, pickupPlace: string, destination: string, dropPlace: string) => {
     return Array.from({ length: totalDays }, (_, i) => {
-        const currentDate = new Date(startDate);
-        currentDate.setDate(startDate.getDate() + i);
-        const formattedDate = formatDate(currentDate.toISOString());
-
         if (i === 0) {
             return {
                 day: i + 1,
-                date: formattedDate,
                 title: `${pickupPlace} To ${destination} (150 KM, 5-6 HRS)`,
                 description: `After arrival at ${pickupPlace} we will drive for ${destination}. Evening is free to Visit Market. Overnight stay at Hotel.`,
             };
         } else if (i === totalDays - 1) {
             return {
                 day: i + 1,
-                date: formattedDate,
                 title: `${destination} – ${dropPlace} (150 Kms, 5-6 Hours)`,
                 description: `Today morning after breakfast we will drive for ${dropPlace}. After reaching check-in the hotel at ${dropPlace}. End of memorable tour and services.`,
             };
         } else {
             return {
                 day: i + 1,
-                date: formattedDate,
                 title: `${destination} Local Sightseeing`,
                 description: `Today after breakfast we will take you to visit famous attractions in ${destination}. Visit local temples, markets, viewpoints, and cultural sites. Evening free to explore. Overnight stay at Hotel.`,
             };
@@ -74,7 +66,7 @@ type editableContentTypes = {
 };
 type itineraryDaysTypes = {
     day: number;
-    date: string;
+    date?: string;
     title: string;
     description: string;
 };
@@ -139,6 +131,9 @@ export const exportToPDF = (
           <p><strong>Greetings from Himachal Taxi Rental Service……</strong></p>
           <p><strong>Please find the below Tour Itinerary & Cost:</strong></p>
         </div>
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; color: #856404; padding: 15px; margin: 20px 0; border-radius: 4px; text-align: center; font-weight: bold; font-size: 14px;">
+          🚨 Note: Drop and pickup location will be Airport/Railway Station or Bus Stand.
+        </div>
         <div class="section-heading">Itinerary</div>
         ${itineraryDays
             .map((day, i) => {
@@ -158,7 +153,7 @@ export const exportToPDF = (
             ${isNotLastInList ? '<div class="day-connector"></div>' : ""}
             <div class="day-card">
               <div class="day-title">${day.title}</div>
-              <div class="day-date">${day.date}</div>
+              <div class="day-date">${day.date || ''}</div>
               <div class="day-desc">${day.description}</div>
               ${pill}
             </div>

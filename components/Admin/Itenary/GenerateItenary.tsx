@@ -1,10 +1,9 @@
-import { differenceInDays } from "date-fns";
 import { X, Edit3, Save, Users, Car, Phone, Download, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { DEFAULT_NOTES, buildDays, exportToPDF } from "./Itenary-export-data"
 
 export default function GenerateItenary({onClose, formData }: any) {
-  const { arrivalDate, endDate, destination, pickupPlace, dropPlace } = formData;
+  const { days, destination, pickupPlace, dropPlace } = formData;
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState(DEFAULT_NOTES);
   const [editableContent, setEditableContent] = useState({
@@ -18,8 +17,8 @@ export default function GenerateItenary({onClose, formData }: any) {
     greeting: "Dear Sir,",
   });
 
-  const totalDays = differenceInDays(new Date(endDate), new Date(arrivalDate)) + 1;
-  const daysData = buildDays(arrivalDate, totalDays, pickupPlace, destination, dropPlace)
+  const totalDays = Number(days);
+  const daysData = buildDays(totalDays, pickupPlace, destination, dropPlace)
   const [itineraryDays, setItineraryDays] = useState(daysData);
 
   const handleEditChange = (field: string, value: string) =>
@@ -36,7 +35,6 @@ export default function GenerateItenary({onClose, formData }: any) {
       ...prev,
       {
         day: prev.length + 1,
-        date: last.date,
         title: `${destination} Local Sightseeing`,
         description: `Today after breakfast we will take you to visit famous attractions in ${destination}. Overnight stay at Hotel.`,
       },
@@ -57,8 +55,7 @@ export default function GenerateItenary({onClose, formData }: any) {
         {
           method: "POST",
           body: JSON.stringify({
-            pickupDate: arrivalDate,
-            dropDate: endDate,
+            days: itineraryDays.length,
             pickupLocation: pickupPlace,
             dropLocation: dropPlace,
             destination: destination,
@@ -66,7 +63,7 @@ export default function GenerateItenary({onClose, formData }: any) {
             adults: editableContent.adults,
             kids: editableContent.children,
             vehicle: editableContent.vehicle,
-            data: daysData.map(({ date, ...rest }) => rest)
+            data: itineraryDays
           })
         }
       )
@@ -130,6 +127,11 @@ export default function GenerateItenary({onClose, formData }: any) {
             <p className="mt-2 font-bold">Greetings from Himachal Taxi Rental Service……</p>
             <p className="mt-2 font-bold">Please find the below Tour Itinerary & Cost:</p>
           </div>
+          
+          {/* Highlighted Notification */}
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 my-6 rounded shadow-sm text-center font-bold text-sm sm:text-base">
+            🚨 Note: Drop and pickup location will be Airport/Railway Station or Bus Stand.
+          </div>
 
           {/* Itinerary */}
           <div>
@@ -141,7 +143,7 @@ export default function GenerateItenary({onClose, formData }: any) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-sm shrink-0">
-                          Day {String(day.day).padStart(2, "0")}: {day.date} ~
+                          Day {String(day.day).padStart(2, "0")}:
                         </span>
                         <input
                           type="text"
@@ -168,7 +170,7 @@ export default function GenerateItenary({onClose, formData }: any) {
                   ) : (
                     <>
                       <h4 className="font-bold text-lg mb-2">
-                        Day {String(day.day).padStart(2, "0")}: {day.date} ~ {day.title}
+                        Day {String(day.day).padStart(2, "0")}: {day.title}
                       </h4>
                       <p className="text-gray-800 leading-relaxed">{day.description}</p>
                     </>

@@ -24,7 +24,6 @@ const getApiUrl = (endpoint: string) => {
         : `${baseUrl}/${endpoint.replace(/^\//, "")}`;
 };
 
-/** Flatten the nested prisma shape into the Booking[] that CabCalendar expects */
 function extractBookings(owners: CabOwner[]): Booking[] {
     const bookings: Booking[] = [];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,7 +73,6 @@ export default function CabManagement() {
     const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
     const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
 
-    // ─── Fetch owners + cabs + bookings ────────────────────────────────────
     const fetchOwners = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -99,7 +97,6 @@ export default function CabManagement() {
         fetchOwners();
     }, [fetchOwners]);
 
-    // ─── Derived data ──────────────────────────────────────────────────────
     const filteredOwners = owners.filter(
         (o) =>
             o.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -129,7 +126,6 @@ export default function CabManagement() {
         setViewYear(y);
     };
 
-    // ─── Add owner ─────────────────────────────────────────────────────────
     const handleAddOwner = async () => {
         if (!ownerForm.name.trim() || isSavingOwner) return;
         setIsSavingOwner(true);
@@ -154,7 +150,6 @@ export default function CabManagement() {
         }
     };
 
-    // ─── Delete owner ──────────────────────────────────────────────────────
     const handleDeleteOwner = async (ownerId: string) => {
         const owner = owners.find((o) => o.id === ownerId);
         if (!owner) return;
@@ -171,7 +166,6 @@ export default function CabManagement() {
         }
     };
 
-    // ─── Add cab ───────────────────────────────────────────────────────────
     const handleAddCab = async (ownerId: string) => {
         if (!cabForm.model.trim() || !cabForm.plateNumber.trim() || isSavingCab) return;
         setIsSavingCab(true);
@@ -203,7 +197,6 @@ export default function CabManagement() {
         }
     };
 
-    // ─── Delete cab ────────────────────────────────────────────────────────
     const handleDeleteCab = async (cabId: string) => {
         const cab = allCabs.find((c) => c.id === cabId);
         if (!cab) return;
@@ -222,7 +215,6 @@ export default function CabManagement() {
         }
     };
 
-    // ─── Render ────────────────────────────────────────────────────────────
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-20 text-gray-400 gap-3">

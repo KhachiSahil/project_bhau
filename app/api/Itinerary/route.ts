@@ -6,8 +6,7 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const {
-            pickupDate,
-            dropDate,
+            days,
             pickupLocation,
             dropLocation,
             destination,
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
         } = body;
         console.log(body)
         // Validation
-        if (!pickupDate || !dropDate || !pickupLocation || !dropLocation || !destination ||
+        if (!days || !pickupLocation || !dropLocation || !destination ||
             budget === undefined || adults === undefined || kids === undefined ||
             !vehicle || !data) {
             return NextResponse.json(
@@ -28,25 +27,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const startDate = new Date(pickupDate);
-        const endDate = new Date(dropDate);
-
-        // Validate dates
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            return NextResponse.json(
-                { error: "Invalid date format" },
-                { status: 400 }
-            );
-        }
-
-        if (endDate <= startDate) {
-            return NextResponse.json(
-                { error: "Drop date must be after pickup date" },
-                { status: 400 }
-            );
-        }
-
-        const difference = differenceInDays(endDate, startDate) + 1;
+        const difference = Number(days);
 
         // Upsert destinations
         const pickup = await prisma.destination.upsert({

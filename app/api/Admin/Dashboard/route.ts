@@ -26,21 +26,21 @@ export async function GET(req: NextRequest) {
                             },
                         }
                     }),
-                    prisma.enquiry.aggregate({
-                        where: {
-                            status: "Completed"
+                    prisma.enquiry.findMany({
+                        where : {
+                            status : "Completed"
                         },
-                        _sum: {
-                            //figuring out how to implement quotation part;
-                            kids: true
+                        select : {
+                            quotation : true
                         }
                     })
                 ])
+                const totalRevenueGenerated = revenueGenerated.reduce((acc,x)=>acc+ Number(x.quotation[0]),0);
                 return NextResponse.json({
                     "totalEnquiries": totalEnquiries,
                     "conversionRate": ((conversionRate / totalEnquiries) * 100).toFixed(2),
                     "pendingFollowups": pendingFollowUps,
-                    "revenueGenerated": 4500
+                    "revenueGenerated": totalRevenueGenerated
 
                 })
             } catch (err) {

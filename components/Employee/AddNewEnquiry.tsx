@@ -1,6 +1,6 @@
 import { differenceInDays, format, addDays } from 'date-fns';
 import { useSession } from 'next-auth/react';
-import {FormEvent, useState } from 'react';
+import {FormEvent, useEffect, useState } from 'react';
 import DestinationDropbox from '../DestinationDropbox';
 
 type ButtonClick = {
@@ -29,7 +29,7 @@ interface NewQueriesProps {
 export default function NewQueries({ onClose }: ButtonClick) {
     const { data: session } = useSession();
     const EmployeeId = session?.user.id
-
+    const website = localStorage.getItem("website")
     const [selection, setSelection] = useState<{ [key: string]: { cab: boolean; hotel: boolean } }>({});
     const [hotelSelection, setHotelSelection] = useState<{ [key: string]: string }>({})
 
@@ -60,7 +60,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
         pickupLocationName: "",
         dropLocationName: "",
         destinationName: "",
-        websiteName: "",
+        websiteName: website || "",
         customer: {
             name: "",
             email: "",
@@ -68,7 +68,6 @@ export default function NewQueries({ onClose }: ButtonClick) {
         }
     })
     const handleChange = (value : string, name : string) => {
-        console.log(value)
         if (["name", "email", "phone"].includes(name)) {
             setData(prev => ({
                 ...prev,
@@ -95,6 +94,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
     const handleSubmit = async (e: FormEvent<HTMLButtonElement>) => {
         try {
             e.preventDefault();
+            console.log(data.websiteName)
             const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/Employee/Enquiry`, {
                 method: 'POST',
                 headers: {
@@ -107,6 +107,7 @@ export default function NewQueries({ onClose }: ButtonClick) {
                     selection
                 })
             });
+            alert("Submitted")
             onClose();
         } catch (err) {
             alert(err);
@@ -291,22 +292,15 @@ export default function NewQueries({ onClose }: ButtonClick) {
                                     value={data.cabOwner}
                                     name='cabOwner'
                                     className="input-field border border-gray-300 rounded-xl p-2.5">
-                                    <option value="Chandu">Chandu</option>
-                                    <option value="Rahul">Rahul</option>
+                                    <option value="Chandu">N/A</option>
+                                    
                                 </select>
                             </div>
                         </div>
 
-                        {/* Website */}
                         <div className="flex flex-col">
                             <label className="font-medium mb-1">Website</label>
-                            <select
-                                onChange={(e)=>handleChange(e.target.value,"websiteName")}
-                                value={data.websiteName}
-                                name='websiteName'
-                                className="input-field border border-gray-300 rounded-xl p-2.5">
-                                <option value="TravelHangouts">TravelHangouts</option>
-                            </select>
+                            <div className='bg-gray-100 p-2 rounded cursor-not-allowed'>{website}</div>
                         </div>
                         <div className="flex flex-col">
                             <label className="font-medium mb-1">Quotation</label>
